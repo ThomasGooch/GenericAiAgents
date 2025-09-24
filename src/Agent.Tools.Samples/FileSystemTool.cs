@@ -61,7 +61,7 @@ public class FileSystemTool : BaseTool
         }
     }
 
-    private Task<ToolResult> ReadFileAsync(string path, CancellationToken cancellationToken)
+    private async Task<ToolResult> ReadFileAsync(string path, CancellationToken cancellationToken)
     {
         try
         {
@@ -88,7 +88,7 @@ public class FileSystemTool : BaseTool
         }
     }
 
-    private Task<ToolResult> WriteFileAsync(string path, string content, CancellationToken cancellationToken)
+    private async Task<ToolResult> WriteFileAsync(string path, string content, CancellationToken cancellationToken)
     {
         try
         {
@@ -173,7 +173,7 @@ public class FileSystemTool : BaseTool
         }
     }
 
-    private Task<ToolResult> DeleteAsync(string path, CancellationToken cancellationToken)
+    private async Task<ToolResult> DeleteAsync(string path, CancellationToken cancellationToken)
     {
         try
         {
@@ -210,7 +210,7 @@ public class FileSystemTool : BaseTool
         }
     }
 
-    private Task<ToolResult> CreateDirectoryAsync(string path, CancellationToken cancellationToken)
+    private async Task<ToolResult> CreateDirectoryAsync(string path, CancellationToken cancellationToken)
     {
         try
         {
@@ -238,7 +238,7 @@ public class FileSystemTool : BaseTool
         }
     }
 
-    private Task<ToolResult> CheckExistsAsync(string path, CancellationToken cancellationToken)
+    private async Task<ToolResult> CheckExistsAsync(string path, CancellationToken cancellationToken)
     {
         try
         {
@@ -262,7 +262,7 @@ public class FileSystemTool : BaseTool
         }
     }
 
-    private Task<ToolResult> GetFileInfoAsync(string path, CancellationToken cancellationToken)
+    private async Task<ToolResult> GetFileInfoAsync(string path, CancellationToken cancellationToken)
     {
         try
         {

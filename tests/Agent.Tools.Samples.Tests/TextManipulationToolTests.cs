@@ -197,7 +197,7 @@ public class TextManipulationToolTests
         var result = await tool.ExecuteAsync(parameters);
 
         Assert.True(result.Success);
-        Assert.Contains("true", result.Output.ToLowerInvariant());
+        Assert.Contains("true", result.Output?.ToLowerInvariant() ?? "");
     }
 
     [Fact]

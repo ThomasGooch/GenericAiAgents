@@ -131,7 +131,7 @@ public class ConfigurationValidatorTests
         var customRule = new ConfigurationValidationRule
         {
             Field = "AgentSystem.Name",
-            Rule = (value) => !value.ToString()!.Contains("Test"),
+            Rule = (value) => value != null && !value.ToString()!.Contains("Test"),
             ErrorMessage = "Name cannot contain 'Test' in production"
         };
 

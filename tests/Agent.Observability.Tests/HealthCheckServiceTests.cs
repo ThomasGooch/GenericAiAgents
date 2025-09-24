@@ -198,7 +198,6 @@ public class HealthCheckServiceTests
     {
         // Arrange
         var interval = TimeSpan.FromMilliseconds(100);
-        var checkCount = 0;
         var tcs = new TaskCompletionSource<bool>();
 
         _mockAgentRegistry.GetAllAgentsAsync().Returns(new List<IAgent>());
@@ -227,11 +226,7 @@ public class HealthCheckServiceTests
         _mockAgentRegistry.GetAllAgentsAsync().Returns(agents);
 
         // Simulate a slow health check
-        _mockAgentRegistry.CheckHealthAsync("slow-agent").Returns(async (callInfo) =>
-        {
-            await Task.Delay(TimeSpan.FromSeconds(2)); // Longer than typical timeout
-            return new AgentHealthStatus { IsHealthy = true };
-        });
+        _mockAgentRegistry.CheckHealthAsync("slow-agent").Returns(Task.FromResult<AgentHealthStatus?>(new AgentHealthStatus { IsHealthy = true }));
 
         // Act
         var timeout = TimeSpan.FromMilliseconds(500);

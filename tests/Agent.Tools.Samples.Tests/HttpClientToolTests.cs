@@ -174,7 +174,7 @@ public class HttpClientToolTests
 
         // Should timeout and return error
         Assert.False(result.Success);
-        Assert.Contains("timeout", result.Error.ToLowerInvariant());
+        Assert.Contains("timeout", result.Error?.ToLowerInvariant() ?? "");
     }
 
     [Fact]
@@ -194,6 +194,6 @@ public class HttpClientToolTests
         var result = await tool.ExecuteAsync(parameters, cts.Token);
 
         Assert.False(result.Success);
-        Assert.Contains("cancelled", result.Error.ToLowerInvariant());
+        Assert.Contains("cancelled", result.Error?.ToLowerInvariant() ?? "");
     }
 }

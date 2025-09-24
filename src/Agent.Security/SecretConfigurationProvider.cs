@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 namespace Agent.Security;
@@ -104,9 +105,9 @@ public class SecretConfigurationSource : IConfigurationSource
             throw new InvalidOperationException("ServiceProvider must be set before building the configuration provider");
         }
 
-        var secretManager = (ISecretManager)ServiceProvider.GetService(typeof(ISecretManager))
+        var secretManager = ServiceProvider.GetService<ISecretManager>()
             ?? throw new InvalidOperationException("ISecretManager service not found");
-        var logger = (ILogger<SecretConfigurationProvider>)ServiceProvider.GetService(typeof(ILogger<SecretConfigurationProvider>))
+        var logger = ServiceProvider.GetService<ILogger<SecretConfigurationProvider>>()
             ?? throw new InvalidOperationException("ILogger<SecretConfigurationProvider> service not found");
 
         return new SecretConfigurationProvider(this, secretManager, logger);
