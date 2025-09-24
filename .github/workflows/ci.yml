@@ -24,10 +24,10 @@ jobs:
         test-project: [
           'tests/Agent.Configuration.Tests',
           'tests/Agent.Core.Tests',
-          'tests/Agent.Integration.Tests',
+          'tests/Integration/Agent.Integration.Tests',
           'tests/Agent.Observability.Tests',
           'tests/Agent.Orchestration.Tests',
-          'tests/Agent.Performance.Tests',
+          'tests/Performance/Agent.Performance.Tests',
           'tests/Agent.Security.Tests',
           'tests/Agent.Tools.Samples.Tests'
         ]
@@ -275,7 +275,7 @@ jobs:
 
     - name: Run integration tests
       run: |
-        docker-compose exec -T agent-api dotnet test tests/Agent.Integration.Tests/ \
+        docker-compose exec -T agent-api dotnet test tests/Integration/Agent.Integration.Tests/ \
           --configuration Release \
           --verbosity normal \
           --logger "console;verbosity=detailed"
