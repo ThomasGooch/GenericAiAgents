@@ -41,6 +41,7 @@ logs/
 
 # Test Results
 TestResults/
+test-results-config/
 coverage/
 
 # OS Files
