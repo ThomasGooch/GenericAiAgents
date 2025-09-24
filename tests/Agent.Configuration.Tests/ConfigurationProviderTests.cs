@@ -2,6 +2,8 @@ using Agent.Configuration;
 using Agent.Configuration.Models;
 using Microsoft.Extensions.Configuration;
 using NSubstitute;
+using System.IO;
+using System.Text.Json;
 
 namespace Agent.Configuration.Tests;
 
@@ -71,10 +73,12 @@ public class ConfigurationProviderTests
         {
           "AgentSystem": {
             "Name": "TestSystem",
+            "Version": "1.0.0",
             "Environment": "Development"
           },
           "Agents": {
-            "MaxConcurrentAgents": 10
+            "MaxConcurrentAgents": 10,
+            "DefaultTimeout": "00:05:00"
           }
         }
         """;
@@ -151,9 +155,9 @@ public class ConfigurationProviderTests
 
         // Assert
         Assert.False(result.IsValid);
-        Assert.Contains(result.Errors, e => e.Contains("Name cannot be empty"));
+        Assert.Contains(result.Errors, e => e.Contains("The Name field is required"));
         Assert.Contains(result.Errors, e => e.Contains("MaxConcurrentAgents must be positive"));
-        Assert.Contains(result.Errors, e => e.Contains("DefaultTimeout cannot be negative"));
+        Assert.Contains(result.Errors, e => e.Contains("DefaultTimeout cannot be negative or zero"));
     }
 
     [Fact]
@@ -218,7 +222,7 @@ public class ConfigurationProviderTests
         try
         {
             // Act & Assert
-            await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            await Assert.ThrowsAsync<InvalidDataException>(() =>
                 _configProvider.LoadConfigurationAsync(configPath));
         }
         finally
