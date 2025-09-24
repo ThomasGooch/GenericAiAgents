@@ -86,27 +86,38 @@ jobs:
           --configuration Release \
           --verbosity normal \
           --collect:"XPlat Code Coverage" \
-          --results-directory ./coverage \
+          --results-directory ./test-results \
           --logger trx \
           --logger "console;verbosity=detailed"
       env:
         ASPNETCORE_ENVIRONMENT: Testing
         JWT_SIGNING_KEY: "this-is-a-test-signing-key-for-ci-cd-pipeline-only"
         
+    - name: Create artifact name
+      id: artifact-name
+      run: echo "name=$(echo '${{ matrix.test-project }}' | tr '/' '-')" >> $GITHUB_OUTPUT
+        
+    - name: List test result files
+      if: always()
+      run: |
+        echo "Looking for test result files..."
+        find . -name "*.trx" -type f || echo "No TRX files found"
+        find . -name "coverage.cobertura.xml" -type f || echo "No coverage files found"
+        ls -la ./test-results/ || echo "test-results directory not found"
+        
     - name: Upload test results
       uses: actions/upload-artifact@v4
       if: always()
       with:
-        name: test-results-${{ matrix.test-project }}
-        path: |
-          **/*.trx
-          ./coverage/**/*
+        name: test-results-${{ steps.artifact-name.outputs.name }}
+        path: ./test-results/
+        if-no-files-found: warn
 
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v4
       if: matrix.test-project == 'tests/Agent.Security.Tests'
       with:
-        directory: ./coverage
+        directory: ./test-results
         fail_ci_if_error: false
 
   security-scan:
