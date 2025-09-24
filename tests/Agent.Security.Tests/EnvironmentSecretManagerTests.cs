@@ -7,6 +7,10 @@ using Xunit;
 
 namespace Agent.Security.Tests;
 
+[CollectionDefinition("EnvironmentVariableTests", DisableParallelization = true)]
+public class EnvironmentVariableTestCollection { }
+
+[Collection("EnvironmentVariableTests")]
 public class EnvironmentSecretManagerTests : IDisposable
 {
     private readonly ILogger<EnvironmentSecretManager> _logger;
@@ -15,6 +19,16 @@ public class EnvironmentSecretManagerTests : IDisposable
 
     public EnvironmentSecretManagerTests()
     {
+        // Clean up any leftover test environment variables first
+        var envVars = Environment.GetEnvironmentVariables();
+        foreach (string key in envVars.Keys)
+        {
+            if (key.StartsWith("TEST_SECRET_", StringComparison.OrdinalIgnoreCase))
+            {
+                Environment.SetEnvironmentVariable(key, null);
+            }
+        }
+        
         _logger = Substitute.For<ILogger<EnvironmentSecretManager>>();
         var options = Options.Create(new SecretManagerOptions
         {
@@ -28,7 +42,7 @@ public class EnvironmentSecretManagerTests : IDisposable
     public async Task GetSecretAsync_WithExistingSecret_ShouldReturnValue()
     {
         // Arrange
-        var secretName = "database-password";
+        var secretName = "DATABASE_PASSWORD";
         var secretValue = "test-password-123";
         var envVarName = "TEST_SECRET_DATABASE_PASSWORD";
         Environment.SetEnvironmentVariable(envVarName, secretValue);
@@ -58,7 +72,7 @@ public class EnvironmentSecretManagerTests : IDisposable
     public async Task SetSecretAsync_ShouldSetEnvironmentVariable()
     {
         // Arrange
-        var secretName = "new-secret";
+        var secretName = "NEW_SECRET";
         var secretValue = "new-value";
         var envVarName = "TEST_SECRET_NEW_SECRET";
         _environmentVariablesToCleanup.Add(envVarName);
@@ -75,7 +89,7 @@ public class EnvironmentSecretManagerTests : IDisposable
     public async Task DeleteSecretAsync_ShouldRemoveEnvironmentVariable()
     {
         // Arrange
-        var secretName = "temp-secret";
+        var secretName = "TEMP_SECRET";
         var envVarName = "TEST_SECRET_TEMP_SECRET";
         Environment.SetEnvironmentVariable(envVarName, "temp-value");
         _environmentVariablesToCleanup.Add(envVarName);
@@ -92,7 +106,7 @@ public class EnvironmentSecretManagerTests : IDisposable
     public async Task SecretExistsAsync_WithExistingSecret_ShouldReturnTrue()
     {
         // Arrange
-        var secretName = "existing-secret";
+        var secretName = "EXISTING_SECRET";
         var envVarName = "TEST_SECRET_EXISTING_SECRET";
         Environment.SetEnvironmentVariable(envVarName, "some-value");
         _environmentVariablesToCleanup.Add(envVarName);
@@ -147,9 +161,34 @@ public class EnvironmentSecretManagerTests : IDisposable
 
     public void Dispose()
     {
+        // Clean up environment variables
         foreach (var envVar in _environmentVariablesToCleanup)
         {
-            Environment.SetEnvironmentVariable(envVar, null);
+            try
+            {
+                Environment.SetEnvironmentVariable(envVar, null);
+            }
+            catch
+            {
+                // Ignore cleanup errors
+            }
+        }
+        
+        // Additional cleanup - remove any TEST_SECRET_ variables
+        var envVars = Environment.GetEnvironmentVariables();
+        foreach (string key in envVars.Keys)
+        {
+            if (key.StartsWith("TEST_SECRET_", StringComparison.OrdinalIgnoreCase))
+            {
+                try
+                {
+                    Environment.SetEnvironmentVariable(key, null);
+                }
+                catch
+                {
+                    // Ignore cleanup errors
+                }
+            }
         }
     }
 }
