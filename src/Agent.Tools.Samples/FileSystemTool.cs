@@ -61,7 +61,7 @@ public class FileSystemTool : BaseTool
         }
     }
 
-    private async Task<ToolResult> ReadFileAsync(string path, CancellationToken cancellationToken)
+    private Task<ToolResult> ReadFileAsync(string path, CancellationToken cancellationToken)
     {
         try
         {
@@ -88,7 +88,7 @@ public class FileSystemTool : BaseTool
         }
     }
 
-    private async Task<ToolResult> WriteFileAsync(string path, string content, CancellationToken cancellationToken)
+    private Task<ToolResult> WriteFileAsync(string path, string content, CancellationToken cancellationToken)
     {
         try
         {
@@ -117,13 +117,13 @@ public class FileSystemTool : BaseTool
         }
     }
 
-    private async Task<ToolResult> ListDirectoryAsync(string path, CancellationToken cancellationToken)
+    private Task<ToolResult> ListDirectoryAsync(string path, CancellationToken cancellationToken)
     {
         try
         {
             if (!Directory.Exists(path))
             {
-                return ToolResult.CreateError($"Directory does not exist: {path}");
+                return Task.FromResult(ToolResult.CreateError($"Directory does not exist: {path}"));
             }
 
             var entries = new List<object>();
@@ -165,15 +165,15 @@ public class FileSystemTool : BaseTool
                 Items = entries
             };
 
-            return ToolResult.CreateSuccess(JsonSerializer.Serialize(result, new JsonSerializerOptions { WriteIndented = true }));
+            return Task.FromResult(ToolResult.CreateSuccess(JsonSerializer.Serialize(result, new JsonSerializerOptions { WriteIndented = true })));
         }
         catch (Exception ex)
         {
-            return ToolResult.CreateError($"Failed to list directory: {ex.Message}");
+            return Task.FromResult(ToolResult.CreateError($"Failed to list directory: {ex.Message}"));
         }
     }
 
-    private async Task<ToolResult> DeleteAsync(string path, CancellationToken cancellationToken)
+    private Task<ToolResult> DeleteAsync(string path, CancellationToken cancellationToken)
     {
         try
         {
@@ -210,7 +210,7 @@ public class FileSystemTool : BaseTool
         }
     }
 
-    private async Task<ToolResult> CreateDirectoryAsync(string path, CancellationToken cancellationToken)
+    private Task<ToolResult> CreateDirectoryAsync(string path, CancellationToken cancellationToken)
     {
         try
         {
@@ -238,7 +238,7 @@ public class FileSystemTool : BaseTool
         }
     }
 
-    private async Task<ToolResult> CheckExistsAsync(string path, CancellationToken cancellationToken)
+    private Task<ToolResult> CheckExistsAsync(string path, CancellationToken cancellationToken)
     {
         try
         {
@@ -262,7 +262,7 @@ public class FileSystemTool : BaseTool
         }
     }
 
-    private async Task<ToolResult> GetFileInfoAsync(string path, CancellationToken cancellationToken)
+    private Task<ToolResult> GetFileInfoAsync(string path, CancellationToken cancellationToken)
     {
         try
         {

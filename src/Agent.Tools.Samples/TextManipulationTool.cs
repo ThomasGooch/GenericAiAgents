@@ -29,7 +29,7 @@ public class TextManipulationTool : BaseTool
         };
     }
 
-    protected override async Task<ToolResult> ExecuteInternalAsync(Dictionary<string, object> parameters, CancellationToken cancellationToken)
+    protected override Task<ToolResult> ExecuteInternalAsync(Dictionary<string, object> parameters, CancellationToken cancellationToken)
     {
         try
         {
@@ -41,7 +41,7 @@ public class TextManipulationTool : BaseTool
             // Validate operation
             if (!_allowedOperations.Contains(operation))
             {
-                return ToolResult.CreateError($"Unsupported operation: {operation}. Supported operations: {string.Join(", ", _allowedOperations)}");
+                return Task.FromResult(ToolResult.CreateError($"Unsupported operation: {operation}. Supported operations: {string.Join(", ", _allowedOperations)}"));
             }
 
             var result = operation switch
@@ -63,11 +63,11 @@ public class TextManipulationTool : BaseTool
                 _ => throw new InvalidOperationException($"Operation {operation} not implemented")
             };
 
-            return ToolResult.CreateSuccess(JsonSerializer.Serialize(result, new JsonSerializerOptions { WriteIndented = true }));
+            return Task.FromResult(ToolResult.CreateSuccess(JsonSerializer.Serialize(result, new JsonSerializerOptions { WriteIndented = true })));
         }
         catch (Exception ex)
         {
-            return ToolResult.CreateError($"Text manipulation failed: {ex.Message}");
+            return Task.FromResult(ToolResult.CreateError($"Text manipulation failed: {ex.Message}"));
         }
     }
 
