@@ -1,0 +1,291 @@
+name: Pull Request Checks
+
+on:
+  pull_request:
+    branches: [ main, develop ]
+    types: [opened, synchronize, reopened]
+
+env:
+  DOTNET_VERSION: '8.0.x'
+
+jobs:
+  pr-info:
+    name: PR Information
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: PR Details
+      run: |
+        echo "🔍 Pull Request Analysis"
+        echo "========================"
+        echo "PR #${{ github.event.pull_request.number }}: ${{ github.event.pull_request.title }}"
+        echo "Author: ${{ github.event.pull_request.user.login }}"
+        echo "Base: ${{ github.event.pull_request.base.ref }}"
+        echo "Head: ${{ github.event.pull_request.head.ref }}"
+        echo "Files changed: ${{ github.event.pull_request.changed_files }}"
+        echo "Additions: +${{ github.event.pull_request.additions }}"
+        echo "Deletions: -${{ github.event.pull_request.deletions }}"
+
+  changed-files:
+    name: Analyze Changed Files
+    runs-on: ubuntu-latest
+    outputs:
+      has-source-changes: ${{ steps.changes.outputs.source }}
+      has-test-changes: ${{ steps.changes.outputs.tests }}
+      has-security-changes: ${{ steps.changes.outputs.security }}
+      has-ci-changes: ${{ steps.changes.outputs.ci }}
+      
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Detect file changes
+      id: changes
+      run: |
+        # Get changed files
+        git diff --name-only origin/${{ github.event.pull_request.base.ref }}...HEAD > changed_files.txt
+        
+        echo "Changed files:"
+        cat changed_files.txt
+        echo
+        
+        # Check for different types of changes
+        if grep -E "^src/.*\.(cs|csproj)$" changed_files.txt; then
+          echo "source=true" >> $GITHUB_OUTPUT
+          echo "✅ Source code changes detected"
+        else
+          echo "source=false" >> $GITHUB_OUTPUT
+          echo "ℹ️ No source code changes"
+        fi
+        
+        if grep -E "^tests/.*\.(cs|csproj)$" changed_files.txt; then
+          echo "tests=true" >> $GITHUB_OUTPUT
+          echo "✅ Test changes detected"
+        else
+          echo "tests=false" >> $GITHUB_OUTPUT
+          echo "ℹ️ No test changes"
+        fi
+        
+        if grep -E "(Security|Authentication|Authorization)" changed_files.txt; then
+          echo "security=true" >> $GITHUB_OUTPUT
+          echo "🔒 Security-related changes detected"
+        else
+          echo "security=false" >> $GITHUB_OUTPUT
+        fi
+        
+        if grep -E "^\.github/|Dockerfile|docker-compose" changed_files.txt; then
+          echo "ci=true" >> $GITHUB_OUTPUT
+          echo "🔧 CI/CD changes detected"
+        else
+          echo "ci=false" >> $GITHUB_OUTPUT
+        fi
+
+  quick-tests:
+    name: Quick Tests
+    runs-on: ubuntu-latest
+    needs: changed-files
+    if: needs.changed-files.outputs.has-source-changes == 'true'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+
+    - name: Restore dependencies
+      run: dotnet restore
+
+    - name: Build solution
+      run: |
+        dotnet build --configuration Release --no-restore
+
+    - name: Run unit tests only
+      run: |
+        dotnet test \
+          --configuration Release \
+          --no-build \
+          --verbosity normal \
+          --filter "Category!=Integration" \
+          --logger "console;verbosity=detailed"
+      env:
+        ASPNETCORE_ENVIRONMENT: Testing
+        JWT_SIGNING_KEY: "pr-test-signing-key"
+
+  security-check:
+    name: Security Review
+    runs-on: ubuntu-latest
+    needs: changed-files
+    if: needs.changed-files.outputs.has-security-changes == 'true'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Security-sensitive changes detected
+      run: |
+        echo "🔒 This PR contains security-sensitive changes!"
+        echo "Please ensure:"
+        echo "- Security review has been completed"
+        echo "- Authentication/authorization changes are tested"
+        echo "- No secrets are hardcoded"
+        echo "- Input validation is properly implemented"
+        echo "- Error handling doesn't leak sensitive information"
+
+    - name: Check for potential issues
+      run: |
+        # Look for potential security issues in the PR
+        echo "Scanning for potential security issues..."
+        
+        if git diff origin/${{ github.event.pull_request.base.ref }}...HEAD | grep -i "password\|secret\|key" | grep "+" | grep -v SecretManager | grep -v TokenProvider; then
+          echo "⚠️ Found potential hardcoded secrets in changes"
+          echo "Please review carefully"
+        fi
+        
+        if git diff origin/${{ github.event.pull_request.base.ref }}...HEAD | grep -E "\.ExecuteSqlRaw|\.FromSqlRaw" | grep "+"; then
+          echo "⚠️ Raw SQL detected - ensure parameterization"
+        fi
+
+  test-coverage:
+    name: Test Coverage Check
+    runs-on: ubuntu-latest
+    needs: [changed-files, quick-tests]
+    if: needs.changed-files.outputs.has-source-changes == 'true' && needs.quick-tests.result == 'success'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+
+    - name: Check test coverage for new code
+      run: |
+        echo "📊 Checking test coverage for changed files..."
+        
+        # Get changed source files
+        git diff --name-only origin/${{ github.event.pull_request.base.ref }}...HEAD \
+          | grep "^src/.*\.cs$" \
+          | head -10 > changed_source_files.txt
+        
+        if [ ! -s changed_source_files.txt ]; then
+          echo "No source files changed, skipping coverage check"
+          exit 0
+        fi
+        
+        echo "Changed source files:"
+        cat changed_source_files.txt
+        
+        # For each changed source file, check if there are corresponding tests
+        echo
+        echo "Test coverage check:"
+        missing_tests=0
+        
+        while read -r file; do
+          # Extract the class name and project
+          class_name=$(basename "$file" .cs)
+          project_path=$(dirname "$file")
+          
+          # Look for test files
+          test_pattern="tests/**/*${class_name}*Test*.cs"
+          
+          if find tests/ -name "*${class_name}*Test*.cs" | head -1 | grep -q .; then
+            echo "✅ $file - Tests found"
+          else
+            echo "⚠️ $file - No tests found"
+            missing_tests=$((missing_tests + 1))
+          fi
+        done < changed_source_files.txt
+        
+        if [ $missing_tests -gt 0 ]; then
+          echo
+          echo "⚠️ $missing_tests source files may need test coverage"
+          echo "Consider adding unit tests for new functionality"
+        fi
+
+  pr-summary:
+    name: PR Summary
+    runs-on: ubuntu-latest
+    needs: [pr-info, changed-files, quick-tests, security-check, test-coverage]
+    if: always()
+    
+    steps:
+    - name: Generate PR summary
+      run: |
+        echo "📋 Pull Request Summary"
+        echo "======================"
+        echo
+        echo "🔍 Changes Analysis:"
+        echo "- Source code: ${{ needs.changed-files.outputs.has-source-changes }}"
+        echo "- Tests: ${{ needs.changed-files.outputs.has-test-changes }}"
+        echo "- Security: ${{ needs.changed-files.outputs.has-security-changes }}"
+        echo "- CI/CD: ${{ needs.changed-files.outputs.has-ci-changes }}"
+        echo
+        echo "✅ Check Results:"
+        echo "- Quick Tests: ${{ needs.quick-tests.result }}"
+        echo "- Security Review: ${{ needs.security-check.result }}"
+        echo "- Coverage Check: ${{ needs.test-coverage.result }}"
+        echo
+        
+        # Determine overall status
+        if [[ "${{ needs.quick-tests.result }}" == "failure" ]] || \
+           [[ "${{ needs.security-check.result }}" == "failure" ]] || \
+           [[ "${{ needs.test-coverage.result }}" == "failure" ]]; then
+          echo "❌ Some PR checks failed. Please review and fix issues."
+          exit 1
+        elif [[ "${{ needs.changed-files.outputs.has-source-changes }}" == "true" ]] && \
+             [[ "${{ needs.quick-tests.result }}" == "success" ]]; then
+          echo "✅ All PR checks passed! Ready for review."
+        else
+          echo "ℹ️ PR contains non-source changes. Manual review recommended."
+        fi
+
+    - name: Comment on PR
+      if: github.event_name == 'pull_request'
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const summary = `
+          ## 🤖 Automated PR Analysis
+          
+          **Changes Detected:**
+          - 📝 Source Code: ${{ needs.changed-files.outputs.has-source-changes }}
+          - 🧪 Tests: ${{ needs.changed-files.outputs.has-test-changes }}
+          - 🔒 Security: ${{ needs.changed-files.outputs.has-security-changes }}
+          - 🔧 CI/CD: ${{ needs.changed-files.outputs.has-ci-changes }}
+          
+          **Check Results:**
+          - 🚀 Quick Tests: ${{ needs.quick-tests.result || 'skipped' }}
+          - 🔍 Security Review: ${{ needs.security-check.result || 'skipped' }}
+          - 📊 Coverage Check: ${{ needs.test-coverage.result || 'skipped' }}
+          
+          ${(() => {
+            const hasFailures = 
+              '${{ needs.quick-tests.result }}' === 'failure' ||
+              '${{ needs.security-check.result }}' === 'failure' ||
+              '${{ needs.test-coverage.result }}' === 'failure';
+            
+            if (hasFailures) {
+              return '❌ **Some checks failed.** Please review the workflow results and fix any issues.';
+            } else if ('${{ needs.changed-files.outputs.has-source-changes }}' === 'true') {
+              return '✅ **All checks passed!** This PR is ready for human review.';
+            } else {
+              return 'ℹ️ **Non-source changes detected.** Manual review is recommended.';
+            }
+          })()}
+          
+          _This comment was automatically generated by the PR check workflow._
+          `;
+          
+          github.rest.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: summary
+          });

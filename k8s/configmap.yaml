@@ -1,0 +1,42 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: agent-system-config
+  namespace: agent-system
+data:
+  appsettings.json: |
+    {
+      "AgentSystem": {
+        "Name": "Generic Agent System",
+        "Version": "1.0.0",
+        "Environment": "Production"
+      },
+      "Agents": {
+        "MaxConcurrentAgents": 20,
+        "DefaultTimeout": "00:10:00",
+        "HealthCheckInterval": "00:01:00"
+      },
+      "Database": {
+        "ConnectionString": "Host=postgres-service;Database=AgentSystem;Username=postgres;Password=$(POSTGRES_PASSWORD)",
+        "MaxConnections": 50,
+        "ConnectionTimeout": "00:00:30"
+      },
+      "Logging": {
+        "Level": "Information",
+        "Providers": ["Console", "File"]
+      },
+      "Monitoring": {
+        "Enabled": true,
+        "MetricsInterval": "00:00:30",
+        "HealthChecks": {
+          "Enabled": true,
+          "Path": "/health",
+          "DetailedPath": "/health/detailed",
+          "Timeout": "00:00:10"
+        }
+      },
+      "Security": {
+        "RequireHttps": true,
+        "AllowedOrigins": ["https://*.agent-system.local"]
+      }
+    }

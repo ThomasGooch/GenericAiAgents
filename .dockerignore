@@ -1,0 +1,81 @@
+# Dockerfile and docker-compose
+Dockerfile*
+docker-compose*
+.dockerignore
+
+# Build artifacts
+**/bin/
+**/obj/
+**/out/
+
+# Test results
+**/TestResults/
+**/test-results/
+**/*.trx
+
+# IDE and editor files
+**/.vs/
+**/.vscode/
+**/*.user
+**/*.suo
+**/*.userosscache
+**/*.sln.docstates
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Logs
+**/logs/
+**/*.log
+
+# Runtime data
+**/pids
+**/*.pid
+**/*.seed
+**/*.pid.lock
+
+# Dependency directories
+**/node_modules/
+**/packages/
+
+# Git
+.git
+.gitignore
+README.md
+
+# Documentation
+**/docs/
+**/*.md
+
+# Configuration that shouldn't be in container
+**/appsettings.Development.json
+**/appsettings.Local.json
+
+# Kubernetes and deployment files
+k8s/
+monitoring/
+scripts/
+
+# CI/CD specific files
+.github/
+*.yml
+*.yaml
+!docker-compose*.yml
+
+# Coverage and test reports
+coverage/
+*.lcov
+**/*.coverage
+
+# NuGet packages
+*.nupkg
+.nuget/
+
+# Environment files
+.env*
