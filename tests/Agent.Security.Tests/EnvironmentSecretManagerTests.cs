@@ -28,7 +28,7 @@ public class EnvironmentSecretManagerTests : IDisposable
                 Environment.SetEnvironmentVariable(key, null);
             }
         }
-        
+
         _logger = Substitute.For<ILogger<EnvironmentSecretManager>>();
         var options = Options.Create(new SecretManagerOptions
         {
@@ -173,7 +173,7 @@ public class EnvironmentSecretManagerTests : IDisposable
                 // Ignore cleanup errors
             }
         }
-        
+
         // Additional cleanup - remove any TEST_SECRET_ variables
         var envVars = Environment.GetEnvironmentVariables();
         foreach (string key in envVars.Keys)

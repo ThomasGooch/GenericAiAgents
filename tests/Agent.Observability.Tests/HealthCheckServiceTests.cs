@@ -70,8 +70,8 @@ public class HealthCheckServiceTests
         Assert.False(result.IsHealthy);
         // With system resources included, unhealthy agents may result in Degraded rather than Critical
         Assert.True(result.OverallStatus == SystemHealthLevel.Critical || result.OverallStatus == SystemHealthLevel.Degraded);
-        Assert.True(result.ComponentHealth.Count >= 1); // At least one component (unhealthy agent)
-        Assert.True(result.ComponentHealth.Any(c => !c.Value.IsHealthy && c.Value.Message.Contains("Agent is experiencing issues")));
+        Assert.NotEmpty(result.ComponentHealth); // At least one component (unhealthy agent)
+        Assert.Contains(result.ComponentHealth, c => !c.Value.IsHealthy && c.Value.Message.Contains("Agent is experiencing issues"));
     }
 
     [Fact(Skip = "System resource checks causing issues in CI")]
@@ -241,7 +241,7 @@ public class HealthCheckServiceTests
         Assert.False(result.IsHealthy);
         Assert.Equal(SystemHealthLevel.Critical, result.OverallStatus);
         // During timeout, the overall system may report timeout rather than individual components
-        Assert.True(result.ComponentHealth.Any(c => c.Value.Message.ToLowerInvariant().Contains("timeout") || 
-                                                   c.Value.Message.ToLowerInvariant().Contains("timed out")));
+        Assert.Contains(result.ComponentHealth, c => c.Value.Message.ToLowerInvariant().Contains("timeout") ||
+                                                   c.Value.Message.ToLowerInvariant().Contains("timed out"));
     }
 }
