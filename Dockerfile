@@ -4,23 +4,28 @@
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
-# Copy csproj files first for better layer caching
-COPY ["src/Agent.Core/Agent.Core.csproj", "src/Agent.Core/"]
+# Copy solution file and csproj files first for better layer caching
+COPY GenericAgents.sln ./
+COPY ["src/Agent.AI/Agent.AI.csproj", "src/Agent.AI/"]
+COPY ["src/Agent.Communication/Agent.Communication.csproj", "src/Agent.Communication/"]
 COPY ["src/Agent.Configuration/Agent.Configuration.csproj", "src/Agent.Configuration/"]
+COPY ["src/Agent.Core/Agent.Core.csproj", "src/Agent.Core/"]
+COPY ["src/Agent.DI/Agent.DI.csproj", "src/Agent.DI/"]
 COPY ["src/Agent.Observability/Agent.Observability.csproj", "src/Agent.Observability/"]
 COPY ["src/Agent.Orchestration/Agent.Orchestration.csproj", "src/Agent.Orchestration/"]
-COPY ["src/Agent.Performance/Agent.Performance.csproj", "src/Agent.Performance/"]
+COPY ["src/Agent.Registry/Agent.Registry.csproj", "src/Agent.Registry/"]
 COPY ["src/Agent.Security/Agent.Security.csproj", "src/Agent.Security/"]
+COPY ["src/Agent.Tools/Agent.Tools.csproj", "src/Agent.Tools/"]
 COPY ["src/Agent.Tools.Samples/Agent.Tools.Samples.csproj", "src/Agent.Tools.Samples/"]
 
-# Restore dependencies
+# Restore dependencies for main project
 RUN dotnet restore "src/Agent.Core/Agent.Core.csproj"
 
 # Copy source code
 COPY src/ src/
 
-# Build the application
-RUN dotnet build -c Release --no-restore
+# Build the main application project and its dependencies
+RUN dotnet build "src/Agent.Core/Agent.Core.csproj" -c Release --no-restore
 RUN dotnet publish "src/Agent.Core/Agent.Core.csproj" -c Release -o /app/publish --no-restore --self-contained false
 
 # ===================================================
@@ -30,14 +35,18 @@ FROM build AS test
 WORKDIR /src
 
 # Copy test projects
+COPY ["tests/Agent.AI.Tests/Agent.AI.Tests.csproj", "tests/Agent.AI.Tests/"]
 COPY ["tests/Agent.Configuration.Tests/Agent.Configuration.Tests.csproj", "tests/Agent.Configuration.Tests/"]
 COPY ["tests/Agent.Core.Tests/Agent.Core.Tests.csproj", "tests/Agent.Core.Tests/"]
-COPY ["tests/Integration/Agent.Integration.Tests/Agent.Integration.Tests.csproj", "tests/Integration/Agent.Integration.Tests/"]
+COPY ["tests/Agent.DI.Tests/Agent.DI.Tests.csproj", "tests/Agent.DI.Tests/"]
 COPY ["tests/Agent.Observability.Tests/Agent.Observability.Tests.csproj", "tests/Agent.Observability.Tests/"]
 COPY ["tests/Agent.Orchestration.Tests/Agent.Orchestration.Tests.csproj", "tests/Agent.Orchestration.Tests/"]
-COPY ["tests/Agent.Performance.Tests/Agent.Performance.Tests.csproj", "tests/Agent.Performance.Tests/"]
+COPY ["tests/Agent.Registry.Tests/Agent.Registry.Tests.csproj", "tests/Agent.Registry.Tests/"]
 COPY ["tests/Agent.Security.Tests/Agent.Security.Tests.csproj", "tests/Agent.Security.Tests/"]
+COPY ["tests/Agent.Tools.Tests/Agent.Tools.Tests.csproj", "tests/Agent.Tools.Tests/"]
 COPY ["tests/Agent.Tools.Samples.Tests/Agent.Tools.Samples.Tests.csproj", "tests/Agent.Tools.Samples.Tests/"]
+COPY ["tests/Integration/Agent.Integration.Tests/Agent.Integration.Tests.csproj", "tests/Integration/Agent.Integration.Tests/"]
+COPY ["tests/Performance/Agent.Performance.Tests/Agent.Performance.Tests.csproj", "tests/Performance/Agent.Performance.Tests/"]
 
 # Restore test dependencies
 RUN dotnet restore
@@ -46,7 +55,7 @@ RUN dotnet restore
 COPY tests/ tests/
 
 # Build tests
-RUN dotnet build tests/ -c Release --no-restore
+RUN dotnet build GenericAgents.sln -c Release --no-restore
 
 # Set environment variables for testing
 ENV ASPNETCORE_ENVIRONMENT=Testing
