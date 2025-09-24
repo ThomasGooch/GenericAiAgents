@@ -120,7 +120,7 @@ public class JwtAuthenticationTests : IDisposable
 
         // Generate token with very short expiration
         var token = await _tokenProvider.GenerateTokenAsync(claims, TimeSpan.FromMilliseconds(50));
-        
+
         // Wait for token to expire
         await Task.Delay(200);
 
@@ -172,14 +172,14 @@ public class JwtAuthenticationTests : IDisposable
 
         // Assert
         Assert.True(validationResult.IsValid);
-        
+
         var validatedClaims = validationResult.Claims.ToList();
-        
+
         // Check that key claims are preserved
         Assert.Equal("roundtrip-user", validationResult.UserId);
         Assert.Contains("admin", validationResult.Roles);
         Assert.Contains("superuser", validationResult.Roles);
-        
+
         // Check that custom claims are preserved
         var customClaim = validatedClaims.FirstOrDefault(c => c.Type == "custom-claim");
         Assert.NotNull(customClaim);

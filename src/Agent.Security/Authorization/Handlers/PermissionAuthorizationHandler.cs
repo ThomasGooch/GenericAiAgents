@@ -33,7 +33,7 @@ public class PermissionAuthorizationHandler : AuthorizationHandler<PermissionAut
             // Admin users have all permissions
             if (context.User.IsInRole(AgentRoles.Admin))
             {
-                _logger.LogDebug("Admin user {UserId} granted permission {Permission}", 
+                _logger.LogDebug("Admin user {UserId} granted permission {Permission}",
                     userId, requirement.Permission);
                 context.Succeed(requirement);
                 return Task.CompletedTask;
@@ -42,7 +42,7 @@ public class PermissionAuthorizationHandler : AuthorizationHandler<PermissionAut
             // Check if user has the specific permission
             if (context.User.HasClaim("permission", requirement.Permission))
             {
-                _logger.LogDebug("User {UserId} has required permission {Permission}", 
+                _logger.LogDebug("User {UserId} has required permission {Permission}",
                     userId, requirement.Permission);
                 context.Succeed(requirement);
                 return Task.CompletedTask;
@@ -51,21 +51,21 @@ public class PermissionAuthorizationHandler : AuthorizationHandler<PermissionAut
             // Check for role-based permissions
             if (HasRoleBasedPermission(context.User, requirement.Permission))
             {
-                _logger.LogDebug("User {UserId} has role-based permission {Permission}", 
+                _logger.LogDebug("User {UserId} has role-based permission {Permission}",
                     userId, requirement.Permission);
                 context.Succeed(requirement);
                 return Task.CompletedTask;
             }
 
-            _logger.LogWarning("User {UserId} denied permission {Permission}", 
+            _logger.LogWarning("User {UserId} denied permission {Permission}",
                 userId, requirement.Permission);
             context.Fail();
             return Task.CompletedTask;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error during permission authorization for user {UserId} and permission {Permission}", 
-                context.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value, 
+            _logger.LogError(ex, "Error during permission authorization for user {UserId} and permission {Permission}",
+                context.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value,
                 requirement.Permission);
             context.Fail();
             return Task.CompletedTask;

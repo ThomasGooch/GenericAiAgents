@@ -36,7 +36,7 @@ public class ConfigurationProviderTests
           }
         }
         """;
-        
+
         await File.WriteAllTextAsync(configPath, configContent);
 
         try
@@ -65,7 +65,7 @@ public class ConfigurationProviderTests
         // Arrange
         Environment.SetEnvironmentVariable("AgentSystem__Environment", "Production");
         Environment.SetEnvironmentVariable("Agents__MaxConcurrentAgents", "20");
-        
+
         var configPath = Path.Combine(Path.GetTempPath(), "test-env-config.json");
         var configContent = """
         {
@@ -78,7 +78,7 @@ public class ConfigurationProviderTests
           }
         }
         """;
-        
+
         await File.WriteAllTextAsync(configPath, configContent);
 
         try
@@ -170,7 +170,7 @@ public class ConfigurationProviderTests
           }
         }
         """;
-        
+
         await File.WriteAllTextAsync(configPath, configContent);
 
         try
@@ -184,7 +184,7 @@ public class ConfigurationProviderTests
             Assert.NotNull(config2);
             Assert.Equal("CachedSystem", config1.AgentSystem.Name);
             Assert.Equal("CachedSystem", config2.AgentSystem.Name);
-            
+
             // Should be same reference if cached properly
             Assert.Same(config1, config2);
         }
@@ -202,7 +202,7 @@ public class ConfigurationProviderTests
         var nonExistentPath = "/non/existent/config.json";
 
         // Act & Assert
-        await Assert.ThrowsAsync<FileNotFoundException>(() => 
+        await Assert.ThrowsAsync<FileNotFoundException>(() =>
             _configProvider.LoadConfigurationAsync(nonExistentPath));
     }
 
@@ -212,7 +212,7 @@ public class ConfigurationProviderTests
         // Arrange
         var configPath = Path.Combine(Path.GetTempPath(), "invalid-config.json");
         var invalidJson = "{ invalid json content }";
-        
+
         await File.WriteAllTextAsync(configPath, invalidJson);
 
         try

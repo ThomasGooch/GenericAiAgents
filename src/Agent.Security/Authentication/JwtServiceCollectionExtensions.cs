@@ -24,7 +24,7 @@ public static class JwtServiceCollectionExtensions
         Action<JwtAuthenticationOptions>? configureOptions = null)
     {
         // Configure JWT options
-        services.Configure<JwtAuthenticationOptions>(options => 
+        services.Configure<JwtAuthenticationOptions>(options =>
         {
             configuration.GetSection("JwtAuthentication").Bind(options);
             configureOptions?.Invoke(options);
@@ -189,7 +189,7 @@ internal class JwtSecretsProvider : IJwtSecretsProvider
     public async Task<string> GetSigningKeyAsync(CancellationToken cancellationToken = default)
     {
         var signingKey = await _secretManager.GetSecretAsync("jwt-signing-key", cancellationToken);
-        
+
         if (string.IsNullOrEmpty(signingKey))
         {
             _logger.LogError("JWT signing key not found in secret manager");
@@ -202,7 +202,7 @@ internal class JwtSecretsProvider : IJwtSecretsProvider
     public async Task<string?> GetOktaClientSecretAsync(CancellationToken cancellationToken = default)
     {
         var clientSecret = await _secretManager.GetSecretAsync("okta-client-secret", cancellationToken);
-        
+
         if (string.IsNullOrEmpty(clientSecret))
         {
             _logger.LogWarning("Okta client secret not found in secret manager");
@@ -214,7 +214,7 @@ internal class JwtSecretsProvider : IJwtSecretsProvider
     public async Task<string?> GetOktaApiTokenAsync(CancellationToken cancellationToken = default)
     {
         var apiToken = await _secretManager.GetSecretAsync("okta-api-token", cancellationToken);
-        
+
         if (string.IsNullOrEmpty(apiToken))
         {
             _logger.LogWarning("Okta API token not found in secret manager");

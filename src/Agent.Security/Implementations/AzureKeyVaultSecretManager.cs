@@ -21,15 +21,15 @@ public class AzureKeyVaultSecretManager : ISecretManager
     {
         _logger = logger;
         var secretManagerOptions = options.Value;
-        _options = secretManagerOptions.AzureKeyVault 
+        _options = secretManagerOptions.AzureKeyVault
             ?? throw new InvalidOperationException("AzureKeyVault options are required when using AzureKeyVault secret manager");
 
         // Create credential based on configuration
         var credential = CreateCredential();
-        
+
         // Create secret client
         _secretClient = new SecretClient(new Uri(_options.VaultUrl), credential);
-        
+
         _logger.LogInformation("Initialized Azure Key Vault secret manager with vault: {VaultUrl}", _options.VaultUrl);
     }
 
@@ -38,7 +38,7 @@ public class AzureKeyVaultSecretManager : ISecretManager
         try
         {
             var response = await _secretClient.GetSecretAsync(secretName, cancellationToken: cancellationToken);
-            
+
             if (response?.Value?.Value == null)
             {
                 _logger.LogWarning("Secret '{SecretName}' not found in Azure Key Vault", secretName);
@@ -66,7 +66,7 @@ public class AzureKeyVaultSecretManager : ISecretManager
         {
             var secret = new KeyVaultSecret(secretName, secretValue);
             await _secretClient.SetSecretAsync(secret, cancellationToken);
-            
+
             _logger.LogDebug("Set secret '{SecretName}' in Azure Key Vault", secretName);
         }
         catch (Exception ex)
@@ -81,7 +81,7 @@ public class AzureKeyVaultSecretManager : ISecretManager
         try
         {
             await _secretClient.StartDeleteSecretAsync(secretName, cancellationToken);
-            
+
             _logger.LogDebug("Deleted secret '{SecretName}' from Azure Key Vault", secretName);
         }
         catch (Azure.RequestFailedException ex) when (ex.Status == 404)
@@ -100,12 +100,12 @@ public class AzureKeyVaultSecretManager : ISecretManager
         try
         {
             var secretNames = new List<string>();
-            
+
             await foreach (var secretProperties in _secretClient.GetPropertiesOfSecretsAsync(cancellationToken))
             {
                 if (!secretProperties.Enabled.GetValueOrDefault(true))
                     continue;
-                    
+
                 secretNames.Add(secretProperties.Name);
             }
 
@@ -124,7 +124,7 @@ public class AzureKeyVaultSecretManager : ISecretManager
         try
         {
             await _secretClient.GetSecretAsync(secretName, cancellationToken: cancellationToken);
-            
+
             _logger.LogDebug("Secret '{SecretName}' exists in Azure Key Vault", secretName);
             return true;
         }
@@ -151,8 +151,8 @@ public class AzureKeyVaultSecretManager : ISecretManager
         if (!string.IsNullOrEmpty(_options.ClientId) && !string.IsNullOrEmpty(_options.TenantId))
         {
             _logger.LogDebug("Using service principal for Azure Key Vault authentication");
-            return new ClientSecretCredential(_options.TenantId, _options.ClientId, 
-                Environment.GetEnvironmentVariable("AZURE_CLIENT_SECRET") 
+            return new ClientSecretCredential(_options.TenantId, _options.ClientId,
+                Environment.GetEnvironmentVariable("AZURE_CLIENT_SECRET")
                 ?? throw new InvalidOperationException("AZURE_CLIENT_SECRET environment variable is required when using service principal authentication"));
         }
 

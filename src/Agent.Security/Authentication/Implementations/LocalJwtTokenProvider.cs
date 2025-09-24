@@ -29,9 +29,9 @@ public class LocalJwtTokenProvider : IJwtTokenProvider
         var jwtOptions = options.Value;
         _options = jwtOptions.Local ?? throw new InvalidOperationException("Local JWT options are required");
         _validationOptions = jwtOptions.TokenValidation;
-        
+
         _tokenHandler = new JwtSecurityTokenHandler();
-        
+
         // Create signing credentials
         var key = Encoding.UTF8.GetBytes(_options.SigningKey);
         _signingCredentials = new SigningCredentials(
@@ -92,7 +92,7 @@ public class LocalJwtTokenProvider : IJwtTokenProvider
         try
         {
             var principal = _tokenHandler.ValidateToken(token, _validationParameters, out var validatedToken);
-            
+
             if (validatedToken is not JwtSecurityToken jwtToken)
             {
                 return new JwtValidationResult

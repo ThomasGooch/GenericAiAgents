@@ -11,7 +11,7 @@ public class HttpClientToolTests
     public void HttpClientTool_ShouldHaveCorrectMetadata()
     {
         var tool = new HttpClientTool();
-        
+
         Assert.Equal("http-client", tool.Name);
         Assert.Equal("Makes HTTP requests to web APIs and returns responses", tool.Description);
     }
@@ -20,14 +20,14 @@ public class HttpClientToolTests
     public void GetParameterSchema_ShouldReturnExpectedSchema()
     {
         var tool = new HttpClientTool();
-        
+
         var schema = tool.GetParameterSchema();
-        
+
         Assert.Contains("url", schema.Keys);
         Assert.Contains("method", schema.Keys);
         Assert.Contains("headers", schema.Keys);
         Assert.Contains("body", schema.Keys);
-        
+
         Assert.Equal(typeof(string), schema["url"]);
         Assert.Equal(typeof(string), schema["method"]);
         Assert.Equal(typeof(string), schema["headers"]);

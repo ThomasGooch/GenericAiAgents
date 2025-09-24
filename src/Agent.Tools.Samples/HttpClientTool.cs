@@ -125,7 +125,7 @@ public class HttpClientTool : BaseTool, IDisposable
 
             // Read response
             var responseContent = await response.Content.ReadAsStringAsync(cancellationToken);
-            
+
             var responseHeaders = response.Headers.ToDictionary(h => h.Key, h => string.Join(", ", h.Value));
             foreach (var contentHeader in response.Content.Headers)
             {

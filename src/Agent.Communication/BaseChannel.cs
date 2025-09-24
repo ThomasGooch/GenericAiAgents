@@ -33,9 +33,9 @@ public abstract class BaseChannel : ICommunicationChannel
     public virtual async Task InitializeAsync(Dictionary<string, object> configuration, CancellationToken cancellationToken = default)
     {
         ThrowIfDisposed();
-        
+
         Configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
-        
+
         await OnInitializeAsync(configuration, cancellationToken);
     }
 
@@ -43,7 +43,7 @@ public abstract class BaseChannel : ICommunicationChannel
     public async Task ConnectAsync(CancellationToken cancellationToken = default)
     {
         ThrowIfDisposed();
-        
+
         if (IsConnected)
             return;
 
@@ -63,7 +63,7 @@ public abstract class BaseChannel : ICommunicationChannel
     public async Task DisconnectAsync(CancellationToken cancellationToken = default)
     {
         ThrowIfDisposed();
-        
+
         if (!IsConnected)
             return;
 
@@ -83,9 +83,9 @@ public abstract class BaseChannel : ICommunicationChannel
     public async Task<CommunicationResponse> SendRequestAsync(CommunicationRequest request, CancellationToken cancellationToken = default)
     {
         ThrowIfDisposed();
-        
+
         ArgumentNullException.ThrowIfNull(request);
-        
+
         if (!IsConnected)
             throw new InvalidOperationException("Channel is not connected");
 
@@ -104,9 +104,9 @@ public abstract class BaseChannel : ICommunicationChannel
     public async Task SendAsync(CommunicationRequest request, CancellationToken cancellationToken = default)
     {
         ThrowIfDisposed();
-        
+
         ArgumentNullException.ThrowIfNull(request);
-        
+
         if (!IsConnected)
             throw new InvalidOperationException("Channel is not connected");
 
@@ -125,9 +125,9 @@ public abstract class BaseChannel : ICommunicationChannel
     public async Task StartListeningAsync(Func<CommunicationRequest, Task<CommunicationResponse>> requestHandler, CancellationToken cancellationToken = default)
     {
         ThrowIfDisposed();
-        
+
         ArgumentNullException.ThrowIfNull(requestHandler);
-        
+
         if (!IsConnected)
             throw new InvalidOperationException("Channel is not connected");
 
@@ -146,7 +146,7 @@ public abstract class BaseChannel : ICommunicationChannel
     public async Task StopListeningAsync(CancellationToken cancellationToken = default)
     {
         ThrowIfDisposed();
-        
+
         try
         {
             await OnStopListeningAsync(cancellationToken);
@@ -169,17 +169,17 @@ public abstract class BaseChannel : ICommunicationChannel
                 {
                     await DisconnectAsync();
                 }
-                
+
                 await OnDisposeAsync();
             }
             catch (Exception ex)
             {
                 OnErrorOccurred($"Dispose failed: {ex.Message}");
             }
-            
+
             _disposed = true;
         }
-        
+
         GC.SuppressFinalize(this);
     }
 
@@ -190,7 +190,7 @@ public abstract class BaseChannel : ICommunicationChannel
     protected abstract Task OnSendAsync(CommunicationRequest request, CancellationToken cancellationToken);
     protected abstract Task OnStartListeningAsync(Func<CommunicationRequest, Task<CommunicationResponse>> requestHandler, CancellationToken cancellationToken);
     protected abstract Task OnStopListeningAsync(CancellationToken cancellationToken);
-    
+
     protected virtual Task OnInitializeAsync(Dictionary<string, object> configuration, CancellationToken cancellationToken)
     {
         // Override in derived classes if needed

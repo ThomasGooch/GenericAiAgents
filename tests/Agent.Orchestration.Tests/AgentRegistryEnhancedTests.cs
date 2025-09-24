@@ -146,13 +146,13 @@ public class AgentRegistryEnhancedTests
         // Arrange
         var healthyAgent = Substitute.For<IAgent>();
         var unhealthyAgent = Substitute.For<IAgent>();
-        
+
         healthyAgent.Id.Returns("healthy-agent");
         unhealthyAgent.Id.Returns("unhealthy-agent");
-        
+
         healthyAgent.CheckHealthAsync(Arg.Any<CancellationToken>())
                    .Returns(new AgentHealthStatus { IsHealthy = true });
-        
+
         unhealthyAgent.CheckHealthAsync(Arg.Any<CancellationToken>())
                       .Returns(new AgentHealthStatus { IsHealthy = false });
 

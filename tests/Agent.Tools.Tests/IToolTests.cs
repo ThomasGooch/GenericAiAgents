@@ -11,7 +11,7 @@ public class IToolTests
     {
         // This test validates that any implementation of ITool has the required properties
         var toolType = typeof(ITool);
-        
+
         Assert.True(toolType.IsInterface);
         Assert.NotNull(toolType.GetProperty("Name"));
         Assert.NotNull(toolType.GetProperty("Description"));
@@ -22,7 +22,7 @@ public class IToolTests
     {
         // This test validates that any implementation of ITool has the required methods
         var toolType = typeof(ITool);
-        
+
         Assert.NotNull(toolType.GetMethod("ExecuteAsync"));
         Assert.NotNull(toolType.GetMethod("ValidateParameters"));
         Assert.NotNull(toolType.GetMethod("GetParameterSchema"));
@@ -37,7 +37,7 @@ public class IToolTests
             Success = true,
             Data = "test data",
             Error = null,
-            Metadata = new Dictionary<string, object> { {"key", "value"} }
+            Metadata = new Dictionary<string, object> { { "key", "value" } }
         };
 
         Assert.True(result.Success);

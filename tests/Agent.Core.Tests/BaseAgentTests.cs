@@ -23,7 +23,7 @@ public class BaseAgentTests
     public void BaseAgent_ShouldHaveRequiredProperties()
     {
         var agent = new TestAgent();
-        
+
         Assert.NotEmpty(agent.Id);
         Assert.Equal("test-agent", agent.Name);
         Assert.Equal("Test Agent for unit testing", agent.Description);
@@ -39,7 +39,7 @@ public class BaseAgentTests
         {
             Name = "test-config",
             Description = "Test configuration",
-            Settings = new Dictionary<string, object> { {"key", "value"} }
+            Settings = new Dictionary<string, object> { { "key", "value" } }
         };
 
         await agent.InitializeAsync(config);
@@ -58,7 +58,7 @@ public class BaseAgentTests
 
         var exception = await Assert.ThrowsAsync<InvalidOperationException>(
             () => agent.ExecuteAsync(request));
-        
+
         Assert.Contains("not been initialized", exception.Message);
     }
 
@@ -80,12 +80,12 @@ public class BaseAgentTests
     [Fact]
     public async Task BaseAgent_ShouldHandleExecutionTimeout()
     {
-        var config = new AgentConfiguration 
-        { 
+        var config = new AgentConfiguration
+        {
             Name = "test",
             Timeout = TimeSpan.FromMilliseconds(50)
         };
-        
+
         var slowAgent = new SlowTestAgent();
         await slowAgent.InitializeAsync(config);
 

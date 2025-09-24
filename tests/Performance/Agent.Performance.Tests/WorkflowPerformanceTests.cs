@@ -23,7 +23,7 @@ public class WorkflowPerformanceBenchmarks
     public async Task GlobalSetup()
     {
         _workflowEngine = new WorkflowEngine();
-        
+
         // Create test agents
         _testAgents = new TestAgent[10];
         for (int i = 0; i < 10; i++)
@@ -70,7 +70,7 @@ public class WorkflowPerformanceBenchmarks
 
         var tasks = workflows.Select(w => _workflowEngine.ExecuteWorkflowAsync(w));
         var results = await Task.WhenAll(tasks);
-        
+
         return results.ToList();
     }
 
@@ -128,7 +128,7 @@ public class WorkflowPerformanceTests
     {
         // This test runs the benchmarks and validates basic performance characteristics
         var summary = BenchmarkRunner.Run<WorkflowPerformanceBenchmarks>();
-        
+
         Assert.NotNull(summary);
         Assert.True(summary.Reports.Any(), "Benchmark reports should be generated");
     }
@@ -142,7 +142,7 @@ public class WorkflowPerformanceTests
         // Arrange
         var workflowEngine = new WorkflowEngine();
         var agent = new TestAgent("perf-test-agent", "Performance Test Agent");
-        
+
         var config = new AgentConfiguration { Timeout = TimeSpan.FromSeconds(30) };
         await agent.InitializeAsync(config);
         await workflowEngine.RegisterAgentAsync(agent);
@@ -167,11 +167,11 @@ public class WorkflowPerformanceTests
         // Assert
         Assert.All(results, result => Assert.True(result.Success));
         Assert.Equal(workflowCount, results.Length);
-        
+
         // Performance targets
         var averageExecutionTime = stopwatch.ElapsedMilliseconds / (double)workflowCount;
         Assert.True(averageExecutionTime < 1000, $"Average execution time {averageExecutionTime}ms exceeds 1000ms target");
-        
+
         await agent.DisposeAsync();
     }
 
@@ -181,7 +181,7 @@ public class WorkflowPerformanceTests
         // Arrange
         var workflowEngine = new WorkflowEngine();
         var agents = new List<TestAgent>();
-        
+
         for (int i = 0; i < 5; i++)
         {
             var agent = new TestAgent($"parallel-test-{i}", $"Agent {i}");
@@ -221,7 +221,7 @@ public class WorkflowPerformanceTests
         // Assert
         Assert.True(sequentialResult.Success);
         Assert.True(parallelResult.Success);
-        
+
         // Parallel should be significantly faster (at least 50% faster)
         var speedupRatio = sequentialResult.ExecutionTime.TotalMilliseconds / parallelResult.ExecutionTime.TotalMilliseconds;
         Assert.True(speedupRatio > 1.5, $"Parallel execution speedup ratio {speedupRatio:F2} should be > 1.5");
@@ -259,9 +259,9 @@ public class WorkflowPerformanceTests
 
             var tasks = workflows.Select(w => workflowEngine.ExecuteWorkflowAsync(w));
             var results = await Task.WhenAll(tasks);
-            
+
             Assert.All(results, r => Assert.True(r.Success));
-            
+
             // Force garbage collection
             GC.Collect();
             GC.WaitForPendingFinalizers();

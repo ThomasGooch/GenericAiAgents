@@ -68,7 +68,7 @@ public static class AuthorizationPolicies
         options.AddPolicy(WorkflowManager, policy =>
             policy.RequireAssertion(context =>
                 context.User.IsInRole(AgentRoles.Admin) ||
-                (context.User.IsInRole(AgentRoles.User) && 
+                (context.User.IsInRole(AgentRoles.User) &&
                  context.User.HasClaim("permission", "workflow:manage"))));
 
         // Metrics viewer policy - Any authenticated user can view metrics

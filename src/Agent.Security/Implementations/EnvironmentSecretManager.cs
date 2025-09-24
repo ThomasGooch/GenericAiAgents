@@ -29,7 +29,7 @@ public class EnvironmentSecretManager : ISecretManager
 
             if (string.IsNullOrEmpty(secretValue))
             {
-                _logger.LogWarning("Secret '{SecretName}' not found in environment variable '{EnvVar}'", 
+                _logger.LogWarning("Secret '{SecretName}' not found in environment variable '{EnvVar}'",
                     secretName, envVarName);
                 return Task.FromResult<string?>(null);
             }
@@ -50,7 +50,7 @@ public class EnvironmentSecretManager : ISecretManager
         {
             var envVarName = GetEnvironmentVariableName(secretName);
             Environment.SetEnvironmentVariable(envVarName, secretValue);
-            
+
             _logger.LogDebug("Set secret '{SecretName}' in environment", secretName);
             return Task.CompletedTask;
         }
@@ -67,7 +67,7 @@ public class EnvironmentSecretManager : ISecretManager
         {
             var envVarName = GetEnvironmentVariableName(secretName);
             Environment.SetEnvironmentVariable(envVarName, null);
-            
+
             _logger.LogDebug("Deleted secret '{SecretName}' from environment", secretName);
             return Task.CompletedTask;
         }
@@ -110,7 +110,7 @@ public class EnvironmentSecretManager : ISecretManager
         {
             var envVarName = GetEnvironmentVariableName(secretName);
             var exists = !string.IsNullOrEmpty(Environment.GetEnvironmentVariable(envVarName));
-            
+
             _logger.LogDebug("Secret '{SecretName}' exists: {Exists}", secretName, exists);
             return Task.FromResult(exists);
         }

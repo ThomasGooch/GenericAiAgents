@@ -19,7 +19,7 @@ public class WorkflowEngine : IWorkflowEngine
     {
         var startTime = DateTime.UtcNow;
         var stopwatch = Stopwatch.StartNew();
-        
+
         var workflowResult = new WorkflowResult
         {
             StartedAt = startTime
@@ -57,15 +57,15 @@ public class WorkflowEngine : IWorkflowEngine
                 case WorkflowExecutionMode.Sequential:
                     await ExecuteSequentialWorkflowAsync(workflow, workflowResult, workflowCts.Token);
                     break;
-                    
+
                 case WorkflowExecutionMode.Parallel:
                     await ExecuteParallelWorkflowAsync(workflow, workflowResult, workflowCts.Token);
                     break;
-                    
+
                 case WorkflowExecutionMode.Dependency:
                     await ExecuteDependencyWorkflowAsync(workflow, workflowResult, workflowCts.Token);
                     break;
-                    
+
                 default:
                     workflowResult.Success = false;
                     workflowResult.Error = $"Unsupported execution mode: {workflow.ExecutionMode}";
@@ -75,15 +75,15 @@ public class WorkflowEngine : IWorkflowEngine
 
             // Determine workflow success: all steps must succeed OR failed steps have ContinueOnFailure = true
             var failedSteps = workflowResult.StepResults.Where(r => !r.Success).ToList();
-            var criticalFailures = failedSteps.Where(fs => 
+            var criticalFailures = failedSteps.Where(fs =>
             {
                 var step = workflow.Steps.FirstOrDefault(s => s.Id == fs.StepId);
                 return step == null || !step.ContinueOnFailure;
             }).ToList();
-            
+
             workflowResult.Success = !criticalFailures.Any();
             status.State = workflowResult.Success ? WorkflowState.Completed : WorkflowState.Failed;
-            
+
             if (!workflowResult.Success)
             {
                 workflowResult.Error = string.Join("; ", criticalFailures.Select(s => $"Step '{s.StepName}': {s.Error}"));
@@ -107,7 +107,7 @@ public class WorkflowEngine : IWorkflowEngine
             workflowResult.ExecutionTime = stopwatch.Elapsed;
             workflowResult.CompletedAt = DateTime.UtcNow;
             status.LastUpdated = DateTime.UtcNow;
-            
+
             // Cleanup
             _workflowCancellations.TryRemove(workflow.Id, out _);
             workflowCts.Dispose();
@@ -119,12 +119,12 @@ public class WorkflowEngine : IWorkflowEngine
     private async Task ExecuteSequentialWorkflowAsync(WorkflowDefinition workflow, WorkflowResult workflowResult, CancellationToken cancellationToken)
     {
         var orderedSteps = workflow.Steps.OrderBy(s => s.Order).ToList();
-        
+
         foreach (var step in orderedSteps)
         {
             var stepResult = await ExecuteStepAsync(step, cancellationToken);
             workflowResult.StepResults.Add(stepResult);
-            
+
             // Update execution status
             if (_executionStatus.TryGetValue(workflow.Id, out var status))
             {
@@ -139,7 +139,7 @@ public class WorkflowEngine : IWorkflowEngine
                 status.ProgressPercentage = (double)status.CompletedSteps.Count / workflow.Steps.Count * 100;
                 status.LastUpdated = DateTime.UtcNow;
             }
-            
+
             // Stop on failure unless configured to continue
             if (!stepResult.Success && !step.ContinueOnFailure)
             {
@@ -152,9 +152,9 @@ public class WorkflowEngine : IWorkflowEngine
     {
         var tasks = workflow.Steps.Select(step => ExecuteStepAsync(step, cancellationToken)).ToArray();
         var stepResults = await Task.WhenAll(tasks);
-        
+
         workflowResult.StepResults.AddRange(stepResults);
-        
+
         // Update execution status
         if (_executionStatus.TryGetValue(workflow.Id, out var status))
         {
@@ -178,40 +178,40 @@ public class WorkflowEngine : IWorkflowEngine
     {
         var completedSteps = new HashSet<Guid>();
         var remainingSteps = workflow.Steps.ToList();
-        
+
         while (remainingSteps.Any() && !cancellationToken.IsCancellationRequested)
         {
             var readySteps = remainingSteps
                 .Where(step => step.Dependencies.All(dep => completedSteps.Contains(dep)))
                 .ToList();
-            
+
             if (!readySteps.Any())
             {
                 throw new InvalidOperationException("Circular dependency detected in workflow steps");
             }
-            
+
             var tasks = readySteps.Select(step => ExecuteStepAsync(step, cancellationToken)).ToArray();
             var stepResults = await Task.WhenAll(tasks);
-            
+
             workflowResult.StepResults.AddRange(stepResults);
-            
+
             foreach (var result in stepResults)
             {
                 if (result.Success)
                 {
                     completedSteps.Add(result.StepId);
                 }
-                
+
                 var step = readySteps.First(s => s.Id == result.StepId);
                 remainingSteps.Remove(step);
-                
+
                 // Stop on failure unless configured to continue
                 if (!result.Success && !step.ContinueOnFailure)
                 {
                     return;
                 }
             }
-            
+
             // Update execution status
             if (_executionStatus.TryGetValue(workflow.Id, out var status))
             {
@@ -226,7 +226,7 @@ public class WorkflowEngine : IWorkflowEngine
     {
         var startTime = DateTime.UtcNow;
         var stopwatch = Stopwatch.StartNew();
-        
+
         var result = new WorkflowStepResult
         {
             StepId = step.Id,
@@ -245,17 +245,17 @@ public class WorkflowEngine : IWorkflowEngine
             }
 
             // Create timeout for step if specified
-            using var stepCts = step.Timeout.HasValue 
+            using var stepCts = step.Timeout.HasValue
                 ? CancellationTokenSource.CreateLinkedTokenSource(cancellationToken)
                 : null;
-                
+
             if (stepCts != null && step.Timeout.HasValue)
             {
                 stepCts.CancelAfter(step.Timeout.Value);
             }
 
             var effectiveToken = stepCts?.Token ?? cancellationToken;
-            
+
             var agentRequest = new AgentRequest
             {
                 Input = step.Input,
@@ -265,7 +265,7 @@ public class WorkflowEngine : IWorkflowEngine
             };
 
             var agentResult = await agent.ProcessAsync(agentRequest, effectiveToken);
-            
+
             result.Success = agentResult.Success;
             result.Output = agentResult.Output?.ToString();
             result.Error = agentResult.Error;
@@ -371,16 +371,16 @@ public class WorkflowEngine : IWorkflowEngine
         if (_workflowCancellations.TryGetValue(workflowId, out var cts))
         {
             cts.Cancel();
-            
+
             if (_executionStatus.TryGetValue(workflowId, out var status))
             {
                 status.State = WorkflowState.Cancelled;
                 status.LastUpdated = DateTime.UtcNow;
             }
-            
+
             return Task.FromResult(true);
         }
-        
+
         return Task.FromResult(false);
     }
 }

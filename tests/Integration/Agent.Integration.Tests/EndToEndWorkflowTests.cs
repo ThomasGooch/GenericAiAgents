@@ -115,7 +115,7 @@ public class EndToEndWorkflowTests : IAsyncLifetime
         // Assert
         Assert.True(result.Success);
         Assert.Equal(3, result.StepResults.Count);
-        
+
         // Parallel execution should be faster than sequential
         var totalSequentialTime = result.StepResults.Sum(s => s.ExecutionTime.TotalMilliseconds);
         Assert.True(result.ExecutionTime.TotalMilliseconds < totalSequentialTime * 0.8);
@@ -211,7 +211,7 @@ public class EndToEndWorkflowTests : IAsyncLifetime
         // Arrange
         var configProvider = new AgentConfigurationProvider();
         var testConfigPath = Path.GetTempFileName();
-        
+
         var testConfig = """
         {
           "AgentSystem": {
@@ -225,7 +225,7 @@ public class EndToEndWorkflowTests : IAsyncLifetime
           }
         }
         """;
-        
+
         await File.WriteAllTextAsync(testConfigPath, testConfig);
 
         try

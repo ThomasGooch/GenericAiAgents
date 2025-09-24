@@ -12,9 +12,9 @@ namespace Agent.Tools.Samples;
 [Description("Performs text manipulation operations like transform, search, replace, and format text")]
 public class TextManipulationTool : BaseTool
 {
-    private static readonly string[] _allowedOperations = 
-    { 
-        "uppercase", "lowercase", "replace", "trim", "reverse", "count", "words", "lines", 
+    private static readonly string[] _allowedOperations =
+    {
+        "uppercase", "lowercase", "replace", "trim", "reverse", "count", "words", "lines",
         "contains", "startswith", "endswith", "substring", "capitalize", "titlecase"
     };
 
@@ -167,8 +167,8 @@ public class TextManipulationTool : BaseTool
 
     private object ProcessWords(string text)
     {
-        var words = string.IsNullOrWhiteSpace(text) 
-            ? Array.Empty<string>() 
+        var words = string.IsNullOrWhiteSpace(text)
+            ? Array.Empty<string>()
             : text.Split(new char[] { ' ', '\t', '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
 
         return new
@@ -352,9 +352,9 @@ public class TextManipulationTool : BaseTool
         }
 
         var words = text.Split(' ');
-        var titleCased = words.Select(word => 
-            string.IsNullOrEmpty(word) 
-                ? word 
+        var titleCased = words.Select(word =>
+            string.IsNullOrEmpty(word)
+                ? word
                 : char.ToUpperInvariant(word[0]) + word.Substring(1).ToLowerInvariant());
 
         var result = string.Join(" ", titleCased);

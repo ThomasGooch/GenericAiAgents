@@ -19,7 +19,7 @@ public class ServiceCollectionExtensionsTests
         services.AddAgentCore();
 
         var serviceProvider = services.BuildServiceProvider();
-        
+
         Assert.NotNull(serviceProvider.GetService<IToolRegistry>());
         Assert.IsType<ToolRegistry>(serviceProvider.GetService<IToolRegistry>());
     }
@@ -33,7 +33,7 @@ public class ServiceCollectionExtensionsTests
         services.AddAgentAI();
 
         var serviceProvider = services.BuildServiceProvider();
-        
+
         Assert.NotNull(serviceProvider.GetService<IAIService>());
         Assert.IsType<SemanticKernelAIService>(serviceProvider.GetService<IAIService>());
     }
@@ -46,7 +46,7 @@ public class ServiceCollectionExtensionsTests
         services.AddAgentToolRegistry();
 
         var serviceDescriptor = services.FirstOrDefault(s => s.ServiceType == typeof(IToolRegistry));
-        
+
         Assert.NotNull(serviceDescriptor);
         Assert.Equal(ServiceLifetime.Singleton, serviceDescriptor.Lifetime);
         Assert.Equal(typeof(ToolRegistry), serviceDescriptor.ImplementationType);
@@ -61,7 +61,7 @@ public class ServiceCollectionExtensionsTests
         services.AddAgentServices();
 
         var serviceProvider = services.BuildServiceProvider();
-        
+
         // Verify all services are registered
         Assert.NotNull(serviceProvider.GetService<IToolRegistry>());
         Assert.NotNull(serviceProvider.GetService<IAIService>());
@@ -72,7 +72,7 @@ public class ServiceCollectionExtensionsTests
     {
         var services = new ServiceCollection();
         services.AddLogging();
-        
+
         var configuration = new ConfigurationBuilder()
             .AddInMemoryCollection(new Dictionary<string, string?>
             {
@@ -86,7 +86,7 @@ public class ServiceCollectionExtensionsTests
         services.AddAgentServices(configuration);
 
         var serviceProvider = services.BuildServiceProvider();
-        
+
         Assert.NotNull(serviceProvider.GetService<IToolRegistry>());
         Assert.NotNull(serviceProvider.GetService<IAIService>());
     }
@@ -101,7 +101,7 @@ public class ServiceCollectionExtensionsTests
         services.AddAgentServices(); // Should not throw
 
         var serviceProvider = services.BuildServiceProvider();
-        
+
         // Should still work correctly
         Assert.NotNull(serviceProvider.GetService<IToolRegistry>());
         Assert.NotNull(serviceProvider.GetService<IAIService>());
@@ -112,7 +112,7 @@ public class ServiceCollectionExtensionsTests
     {
         var services = new ServiceCollection();
         services.AddLogging();
-        
+
         var configuration = new ConfigurationBuilder()
             .AddInMemoryCollection(new Dictionary<string, string?>
             {
@@ -128,7 +128,7 @@ public class ServiceCollectionExtensionsTests
         services.AddAgentServices(configuration);
 
         var serviceProvider = services.BuildServiceProvider();
-        
+
         // Verify services can be resolved
         Assert.NotNull(serviceProvider.GetService<IAIService>());
     }
@@ -154,14 +154,14 @@ public class ServiceCollectionExtensionsTests
     {
         var services = new ServiceCollection();
         services.AddLogging();
-        
+
         // Add some existing services
         services.AddSingleton<IConfiguration>(new ConfigurationBuilder().Build());
 
         services.AddAgentServices();
 
         var serviceProvider = services.BuildServiceProvider();
-        
+
         // Should resolve both existing and new services
         Assert.NotNull(serviceProvider.GetService<IConfiguration>());
         Assert.NotNull(serviceProvider.GetService<IToolRegistry>());

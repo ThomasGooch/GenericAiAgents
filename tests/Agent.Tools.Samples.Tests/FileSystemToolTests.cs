@@ -18,7 +18,7 @@ public class FileSystemToolTests
     public void FileSystemTool_ShouldHaveCorrectMetadata()
     {
         var tool = new FileSystemTool();
-        
+
         Assert.Equal("file-system", tool.Name);
         Assert.Equal("Performs file system operations like read, write, list, and delete files and directories", tool.Description);
     }
@@ -27,13 +27,13 @@ public class FileSystemToolTests
     public void GetParameterSchema_ShouldReturnExpectedSchema()
     {
         var tool = new FileSystemTool();
-        
+
         var schema = tool.GetParameterSchema();
-        
+
         Assert.Contains("operation", schema.Keys);
         Assert.Contains("path", schema.Keys);
         Assert.Contains("content", schema.Keys);
-        
+
         Assert.Equal(typeof(string), schema["operation"]);
         Assert.Equal(typeof(string), schema["path"]);
         Assert.Equal(typeof(string), schema["content"]);
@@ -95,7 +95,7 @@ public class FileSystemToolTests
         var tool = new FileSystemTool();
         var filePath = Path.Combine(_testDirectory, "read-test.txt");
         var expectedContent = "Test content for reading";
-        
+
         File.WriteAllText(filePath, expectedContent);
 
         var parameters = new Dictionary<string, object>
@@ -236,6 +236,7 @@ public class FileSystemToolTests
         Assert.Contains("\"Exists\": false", result.Output);
     }
 
+    [Fact]
     public void Dispose()
     {
         if (Directory.Exists(_testDirectory))

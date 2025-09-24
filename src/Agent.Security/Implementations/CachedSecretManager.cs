@@ -35,7 +35,7 @@ public class CachedSecretManager : ISecretManager
         }
 
         var cacheKey = GetCacheKey(secretName);
-        
+
         if (_cache.TryGetValue(cacheKey, out string? cachedValue))
         {
             _logger.LogDebug("Retrieved secret '{SecretName}' from cache", secretName);
@@ -43,7 +43,7 @@ public class CachedSecretManager : ISecretManager
         }
 
         var secretValue = await _innerSecretManager.GetSecretAsync(secretName, cancellationToken);
-        
+
         if (secretValue != null)
         {
             var cacheEntryOptions = new MemoryCacheEntryOptions
@@ -51,7 +51,7 @@ public class CachedSecretManager : ISecretManager
                 AbsoluteExpirationRelativeToNow = _options.CacheExpiration,
                 Priority = CacheItemPriority.High
             };
-            
+
             _cache.Set(cacheKey, secretValue, cacheEntryOptions);
             _logger.LogDebug("Cached secret '{SecretName}' for {Expiration}", secretName, _options.CacheExpiration);
         }
@@ -62,7 +62,7 @@ public class CachedSecretManager : ISecretManager
     public async Task SetSecretAsync(string secretName, string secretValue, CancellationToken cancellationToken = default)
     {
         await _innerSecretManager.SetSecretAsync(secretName, secretValue, cancellationToken);
-        
+
         if (_options.EnableCaching)
         {
             var cacheKey = GetCacheKey(secretName);
@@ -74,7 +74,7 @@ public class CachedSecretManager : ISecretManager
     public async Task DeleteSecretAsync(string secretName, CancellationToken cancellationToken = default)
     {
         await _innerSecretManager.DeleteSecretAsync(secretName, cancellationToken);
-        
+
         if (_options.EnableCaching)
         {
             var cacheKey = GetCacheKey(secretName);

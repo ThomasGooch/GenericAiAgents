@@ -12,7 +12,7 @@ public class IToolRegistryTests
     {
         // This test verifies the interface contract exists
         var registry = Substitute.For<IToolRegistry>();
-        
+
         Assert.NotNull(registry);
     }
 
@@ -24,7 +24,7 @@ public class IToolRegistryTests
         tool.Name.Returns("test-tool");
 
         await registry.RegisterToolAsync(tool);
-        
+
         await registry.Received(1).RegisterToolAsync(tool);
     }
 
@@ -34,11 +34,11 @@ public class IToolRegistryTests
         var registry = Substitute.For<IToolRegistry>();
         var tool = Substitute.For<ITool>();
         tool.Name.Returns("test-tool");
-        
+
         registry.GetToolAsync("test-tool").Returns(tool);
-        
+
         var result = await registry.GetToolAsync("test-tool");
-        
+
         Assert.Equal(tool, result);
     }
 
@@ -51,11 +51,11 @@ public class IToolRegistryTests
             Substitute.For<ITool>(),
             Substitute.For<ITool>()
         };
-        
+
         registry.GetAllToolsAsync().Returns(tools);
-        
+
         var result = await registry.GetAllToolsAsync();
-        
+
         Assert.Equal(2, result.Count());
     }
 
@@ -63,9 +63,9 @@ public class IToolRegistryTests
     public async Task DiscoverAndRegisterTools_ShouldScanAssembly()
     {
         var registry = Substitute.For<IToolRegistry>();
-        
+
         await registry.DiscoverAndRegisterToolsAsync();
-        
+
         await registry.Received(1).DiscoverAndRegisterToolsAsync();
     }
 }

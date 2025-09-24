@@ -96,7 +96,7 @@ public class InMemoryChannel : BaseChannel
 
         // Queue message for processing
         targetChannel._messageQueue.Enqueue(request);
-        
+
         return Task.CompletedTask;
     }
 
@@ -104,10 +104,10 @@ public class InMemoryChannel : BaseChannel
     {
         _requestHandler = requestHandler;
         _isListening = true;
-        
+
         // Start background processing of queued messages
         _ = Task.Run(async () => await ProcessQueuedMessagesAsync(cancellationToken), cancellationToken);
-        
+
         return Task.CompletedTask;
     }
 

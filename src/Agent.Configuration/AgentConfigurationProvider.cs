@@ -35,7 +35,7 @@ public class AgentConfigurationProvider : IAgentConfigurationProvider
 
         var configuration = builder.Build();
         var agentConfig = new AgentSystemConfiguration();
-        
+
         try
         {
             configuration.Bind(agentConfig);
@@ -176,7 +176,7 @@ public class AgentConfigurationProvider : IAgentConfigurationProvider
 
         var json = JsonSerializer.Serialize(configuration, options);
         await File.WriteAllTextAsync(configPath, json, cancellationToken);
-        
+
         // Update cache
         _configurationCache[configPath] = configuration;
     }
@@ -186,22 +186,22 @@ public class AgentConfigurationProvider : IAgentConfigurationProvider
         var merged = new AgentSystemConfiguration();
 
         // Merge system settings
-        merged.AgentSystem.Name = !string.IsNullOrEmpty(overrideConfig.AgentSystem.Name) 
-            ? overrideConfig.AgentSystem.Name 
+        merged.AgentSystem.Name = !string.IsNullOrEmpty(overrideConfig.AgentSystem.Name)
+            ? overrideConfig.AgentSystem.Name
             : baseConfig.AgentSystem.Name;
-        merged.AgentSystem.Version = !string.IsNullOrEmpty(overrideConfig.AgentSystem.Version) 
-            ? overrideConfig.AgentSystem.Version 
+        merged.AgentSystem.Version = !string.IsNullOrEmpty(overrideConfig.AgentSystem.Version)
+            ? overrideConfig.AgentSystem.Version
             : baseConfig.AgentSystem.Version;
-        merged.AgentSystem.Environment = !string.IsNullOrEmpty(overrideConfig.AgentSystem.Environment) 
-            ? overrideConfig.AgentSystem.Environment 
+        merged.AgentSystem.Environment = !string.IsNullOrEmpty(overrideConfig.AgentSystem.Environment)
+            ? overrideConfig.AgentSystem.Environment
             : baseConfig.AgentSystem.Environment;
 
         // Merge agent settings
-        merged.Agents.MaxConcurrentAgents = overrideConfig.Agents.MaxConcurrentAgents != 0 
-            ? overrideConfig.Agents.MaxConcurrentAgents 
+        merged.Agents.MaxConcurrentAgents = overrideConfig.Agents.MaxConcurrentAgents != 0
+            ? overrideConfig.Agents.MaxConcurrentAgents
             : baseConfig.Agents.MaxConcurrentAgents;
-        merged.Agents.DefaultTimeout = overrideConfig.Agents.DefaultTimeout != default 
-            ? overrideConfig.Agents.DefaultTimeout 
+        merged.Agents.DefaultTimeout = overrideConfig.Agents.DefaultTimeout != default
+            ? overrideConfig.Agents.DefaultTimeout
             : baseConfig.Agents.DefaultTimeout;
 
         // Merge other sections as needed
@@ -239,11 +239,11 @@ public class AgentConfigurationProvider : IAgentConfigurationProvider
             {
                 await Task.Delay(100, cancellationToken); // Brief delay to ensure file write is complete
                 var newConfig = await LoadConfigurationAsync(configPath, true, cancellationToken);
-                
+
                 // Clear cache and update
                 _configurationCache.TryRemove(configPath, out _);
                 _configurationCache[configPath] = newConfig;
-                
+
                 onChanged(newConfig);
             }
             catch (Exception)

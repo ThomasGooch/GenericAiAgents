@@ -13,10 +13,10 @@ public abstract class BaseTool : ITool
     protected BaseTool()
     {
         var type = GetType();
-        
+
         var toolAttribute = type.GetCustomAttribute<ToolAttribute>()
             ?? throw new InvalidOperationException($"Tool class {type.Name} must have a [Tool] attribute");
-        
+
         var descriptionAttribute = type.GetCustomAttribute<DescriptionAttribute>()
             ?? throw new InvalidOperationException($"Tool class {type.Name} must have a [Description] attribute");
 

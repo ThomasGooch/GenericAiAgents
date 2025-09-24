@@ -23,7 +23,7 @@ public class ResourceAuthorizationHandler : AuthorizationHandler<ResourceAuthori
         try
         {
             var userId = context.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-            
+
             if (string.IsNullOrEmpty(userId))
             {
                 _logger.LogWarning("No user ID found in claims for resource authorization");
@@ -34,7 +34,7 @@ public class ResourceAuthorizationHandler : AuthorizationHandler<ResourceAuthori
             // Check if user owns the resource
             if (resource.OwnerId == userId)
             {
-                _logger.LogDebug("User {UserId} authorized to access owned resource {ResourceId}", 
+                _logger.LogDebug("User {UserId} authorized to access owned resource {ResourceId}",
                     userId, resource.Id);
                 context.Succeed(requirement);
                 return Task.CompletedTask;
@@ -43,7 +43,7 @@ public class ResourceAuthorizationHandler : AuthorizationHandler<ResourceAuthori
             // Check if user has Admin role (can access any resource)
             if (context.User.IsInRole(AgentRoles.Admin))
             {
-                _logger.LogDebug("Admin user {UserId} authorized to access resource {ResourceId}", 
+                _logger.LogDebug("Admin user {UserId} authorized to access resource {ResourceId}",
                     userId, resource.Id);
                 context.Succeed(requirement);
                 return Task.CompletedTask;
@@ -52,7 +52,7 @@ public class ResourceAuthorizationHandler : AuthorizationHandler<ResourceAuthori
             // Check if user has Service role and resource allows service access
             if (context.User.IsInRole(AgentRoles.Service) && resource.AllowServiceAccess)
             {
-                _logger.LogDebug("Service user {UserId} authorized to access resource {ResourceId}", 
+                _logger.LogDebug("Service user {UserId} authorized to access resource {ResourceId}",
                     userId, resource.Id);
                 context.Succeed(requirement);
                 return Task.CompletedTask;
@@ -62,21 +62,21 @@ public class ResourceAuthorizationHandler : AuthorizationHandler<ResourceAuthori
             var requiredPermission = $"{resource.ResourceType}:{requirement.Operation}";
             if (context.User.HasClaim("permission", requiredPermission))
             {
-                _logger.LogDebug("User {UserId} has permission {Permission} for resource {ResourceId}", 
+                _logger.LogDebug("User {UserId} has permission {Permission} for resource {ResourceId}",
                     userId, requiredPermission, resource.Id);
                 context.Succeed(requirement);
                 return Task.CompletedTask;
             }
 
-            _logger.LogWarning("User {UserId} denied access to resource {ResourceId} (operation: {Operation})", 
+            _logger.LogWarning("User {UserId} denied access to resource {ResourceId} (operation: {Operation})",
                 userId, resource.Id, requirement.Operation);
             context.Fail();
             return Task.CompletedTask;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error during resource authorization for user {UserId} and resource {ResourceId}", 
-                context.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value, 
+            _logger.LogError(ex, "Error during resource authorization for user {UserId} and resource {ResourceId}",
+                context.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value,
                 resource.Id);
             context.Fail();
             return Task.CompletedTask;

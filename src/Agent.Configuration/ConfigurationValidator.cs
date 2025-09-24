@@ -108,20 +108,20 @@ public class ConfigurationValidator : IConfigurationValidator
         var existingErrors = new HashSet<string>(result.Errors);
 
         // Validate system settings - only if not already caught by data annotations
-        if (string.IsNullOrWhiteSpace(configuration.AgentSystem.Name) && 
+        if (string.IsNullOrWhiteSpace(configuration.AgentSystem.Name) &&
             !existingErrors.Any(e => e.Contains("AgentSystem.Name")))
         {
             result.Errors.Add("AgentSystem.Name: Name cannot be empty or whitespace");
         }
 
-        if (!IsValidSemanticVersion(configuration.AgentSystem.Version) && 
+        if (!IsValidSemanticVersion(configuration.AgentSystem.Version) &&
             !existingErrors.Any(e => e.Contains("AgentSystem.Version") && e.Contains("semantic version")))
         {
             result.Errors.Add("AgentSystem.Version: Version must be in semantic version format (e.g., 1.0.0)");
         }
 
         // Validate agent settings - only if not already caught by data annotations
-        if (configuration.Agents.MaxConcurrentAgents <= 0 && 
+        if (configuration.Agents.MaxConcurrentAgents <= 0 &&
             !existingErrors.Any(e => e.Contains("Agents.MaxConcurrentAgents")))
         {
             result.Errors.Add("Agents.MaxConcurrentAgents: MaxConcurrentAgents must be positive");
@@ -140,13 +140,13 @@ public class ConfigurationValidator : IConfigurationValidator
         // Validate database settings
         if (configuration.Database != null)
         {
-            if (string.IsNullOrWhiteSpace(configuration.Database.ConnectionString) && 
+            if (string.IsNullOrWhiteSpace(configuration.Database.ConnectionString) &&
                 !existingErrors.Any(e => e.Contains("Database.ConnectionString")))
             {
                 result.Errors.Add("Database.ConnectionString: Connection string cannot be empty");
             }
 
-            if (configuration.Database.MaxConnections <= 0 && 
+            if (configuration.Database.MaxConnections <= 0 &&
                 !existingErrors.Any(e => e.Contains("Database.MaxConnections")))
             {
                 result.Errors.Add("Database.MaxConnections: MaxConnections must be positive");
@@ -308,15 +308,15 @@ public static class ValidationExtensions
         // Validate current object with data annotations
         var currentContext = new ValidationContext(obj);
         var currentResults = new List<ValidationResult>();
-        
+
         if (!Validator.TryValidateObject(obj, currentContext, currentResults, true))
         {
             isValid = false;
             foreach (var result in currentResults)
             {
-                var memberNames = result.MemberNames.Select(name => 
+                var memberNames = result.MemberNames.Select(name =>
                     string.IsNullOrEmpty(prefix) ? name : $"{prefix}.{name}").ToArray();
-                
+
                 results.Add(new ValidationResult(result.ErrorMessage, memberNames));
             }
         }
@@ -334,9 +334,9 @@ public static class ValidationExtensions
 
             // Skip primitive types, strings, and DateTime
             var propertyType = property.PropertyType;
-            if (propertyType.IsPrimitive || 
-                propertyType == typeof(string) || 
-                propertyType == typeof(DateTime) || 
+            if (propertyType.IsPrimitive ||
+                propertyType == typeof(string) ||
+                propertyType == typeof(DateTime) ||
                 propertyType == typeof(TimeSpan) ||
                 propertyType == typeof(Guid) ||
                 propertyType.IsEnum)

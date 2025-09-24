@@ -17,7 +17,7 @@ public class ToolRegistry : IToolRegistry
     public Task RegisterToolAsync(ITool tool, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(tool);
-        
+
         _tools.AddOrUpdate(tool.Name, tool, (key, existingTool) => tool);
         return Task.CompletedTask;
     }
@@ -127,7 +127,7 @@ public class ToolRegistry : IToolRegistry
         {
             // Handle assemblies that can't be fully loaded
             var loadableTypes = ex.Types.Where(t => t != null).ToArray();
-            
+
             var toolTypes = loadableTypes
                 .Where(type => typeof(ITool).IsAssignableFrom(type) &&
                               !type.IsAbstract &&

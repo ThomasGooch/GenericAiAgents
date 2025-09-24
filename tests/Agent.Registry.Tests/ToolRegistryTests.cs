@@ -12,7 +12,7 @@ public class ToolRegistryTests
     public void ToolRegistry_ShouldHaveRequiredProperties()
     {
         var registry = new ToolRegistry();
-        
+
         Assert.NotNull(registry);
     }
 

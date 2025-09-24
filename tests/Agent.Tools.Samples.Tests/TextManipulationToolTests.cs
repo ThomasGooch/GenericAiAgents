@@ -10,7 +10,7 @@ public class TextManipulationToolTests
     public void TextManipulationTool_ShouldHaveCorrectMetadata()
     {
         var tool = new TextManipulationTool();
-        
+
         Assert.Equal("text-manipulation", tool.Name);
         Assert.Equal("Performs text manipulation operations like transform, search, replace, and format text", tool.Description);
     }
@@ -19,14 +19,14 @@ public class TextManipulationToolTests
     public void GetParameterSchema_ShouldReturnExpectedSchema()
     {
         var tool = new TextManipulationTool();
-        
+
         var schema = tool.GetParameterSchema();
-        
+
         Assert.Contains("operation", schema.Keys);
         Assert.Contains("text", schema.Keys);
         Assert.Contains("search", schema.Keys);
         Assert.Contains("replace", schema.Keys);
-        
+
         Assert.Equal(typeof(string), schema["operation"]);
         Assert.Equal(typeof(string), schema["text"]);
         Assert.Equal(typeof(string), schema["search"]);

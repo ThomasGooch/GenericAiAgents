@@ -10,7 +10,7 @@ public class IAgentTests
     {
         // This test validates that any implementation of IAgent has the required properties
         var agentType = typeof(IAgent);
-        
+
         Assert.True(agentType.IsInterface);
         Assert.NotNull(agentType.GetProperty("Id"));
         Assert.NotNull(agentType.GetProperty("Name"));
@@ -24,10 +24,10 @@ public class IAgentTests
     {
         // This test validates that any implementation of IAgent has the required methods
         var agentType = typeof(IAgent);
-        
+
         Assert.NotNull(agentType.GetMethod("InitializeAsync"));
         Assert.NotNull(agentType.GetMethod("ExecuteAsync"));
-        
+
         // Check that IAgent inherits from IAsyncDisposable
         Assert.True(typeof(IAsyncDisposable).IsAssignableFrom(agentType));
     }
@@ -40,8 +40,8 @@ public class IAgentTests
         {
             Id = Guid.NewGuid(),
             Input = "test input",
-            Context = new Dictionary<string, object> { {"key", "value"} },
-            Metadata = new Dictionary<string, object> { {"meta", "data"} }
+            Context = new Dictionary<string, object> { { "key", "value" } },
+            Metadata = new Dictionary<string, object> { { "meta", "data" } }
         };
 
         Assert.NotEqual(Guid.Empty, request.Id);
@@ -59,7 +59,7 @@ public class IAgentTests
             Success = true,
             Output = "test output",
             Error = null,
-            Metadata = new Dictionary<string, object> { {"result", "metadata"} }
+            Metadata = new Dictionary<string, object> { { "result", "metadata" } }
         };
 
         Assert.True(result.Success);

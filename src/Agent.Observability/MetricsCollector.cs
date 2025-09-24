@@ -16,7 +16,7 @@ public class MetricsCollector : IMetricsCollector
     private readonly ConcurrentDictionary<string, double> _gauges = new();
     private readonly ActivitySource _activitySource = new("Agent.System");
     private readonly object _metricsLock = new();
-    
+
     private bool _enabled = true;
     private bool _disposed = false;
     private long _totalRequests = 0;
@@ -39,7 +39,7 @@ public class MetricsCollector : IMetricsCollector
         if (!_enabled) return;
 
         _counters.AddOrUpdate(name, value, (key, existingValue) => existingValue + value);
-        
+
         OnMetricsCollected(new MetricsCollectedEventArgs
         {
             MetricName = name,
@@ -76,7 +76,7 @@ public class MetricsCollector : IMetricsCollector
         if (!_enabled) return;
 
         _gauges[name] = value;
-        
+
         OnMetricsCollected(new MetricsCollectedEventArgs
         {
             MetricName = name,
@@ -97,7 +97,7 @@ public class MetricsCollector : IMetricsCollector
 
         // Record execution time
         RecordValue("agent.execution.duration", metrics.ExecutionTime.TotalMilliseconds, tags);
-        
+
         // Record success/failure
         if (metrics.Success)
         {
@@ -122,7 +122,7 @@ public class MetricsCollector : IMetricsCollector
         lock (_metricsLock)
         {
             _responseTimes.Add(metrics.ExecutionTime.TotalMilliseconds);
-            
+
             // Keep only last 1000 response times to prevent memory growth
             if (_responseTimes.Count > 1000)
             {
@@ -147,7 +147,7 @@ public class MetricsCollector : IMetricsCollector
 
         // Record execution time
         RecordValue("workflow.execution.duration", metrics.ExecutionTime.TotalMilliseconds, tags);
-        
+
         // Record average step time
         if (metrics.CompletedSteps > 0)
         {
@@ -352,7 +352,7 @@ public class MetricsCollector : IMetricsCollector
     {
         return _counters.GetValueOrDefault(name, 0);
     }
-    
+
     internal List<double> GetHistogramValues(string name)
     {
         lock (_metricsLock)
@@ -360,7 +360,7 @@ public class MetricsCollector : IMetricsCollector
             return _histograms.GetValueOrDefault(name, new List<double>()).ToList();
         }
     }
-    
+
     internal double GetGaugeValue(string name)
     {
         return _gauges.GetValueOrDefault(name, 0);

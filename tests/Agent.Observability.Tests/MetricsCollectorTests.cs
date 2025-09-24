@@ -137,10 +137,10 @@ public class MetricsCollectorTests : IDisposable
             MemoryUsage = 1024,
             CpuUsage = 0.25
         };
-        
+
         var failedAgent = new AgentPerformanceMetrics
         {
-            AgentId = "agent-2", 
+            AgentId = "agent-2",
             ExecutionTime = TimeSpan.FromMilliseconds(200),
             Success = false,
             MemoryUsage = 2048,

@@ -22,9 +22,9 @@ public class BaseToolTests
         {
             var input = parameters["input"].ToString();
             var count = Convert.ToInt32(parameters["count"]);
-            
+
             await Task.Delay(10, cancellationToken);
-            
+
             return ToolResult.CreateSuccess($"Processed {input} {count} times");
         }
     }
@@ -47,7 +47,7 @@ public class BaseToolTests
     public void BaseTool_ShouldExtractNameAndDescriptionFromAttributes()
     {
         var tool = new TestTool();
-        
+
         Assert.Equal("test_tool", tool.Name);
         Assert.Equal("Test tool for unit testing", tool.Description);
     }
@@ -63,7 +63,7 @@ public class BaseToolTests
     {
         var tool = new TestTool();
         var schema = tool.GetParameterSchema();
-        
+
         Assert.Equal(2, schema.Count);
         Assert.Equal(typeof(string), schema["input"]);
         Assert.Equal(typeof(int), schema["count"]);
@@ -151,10 +151,10 @@ public class BaseToolTests
     {
         var tool = new SlowTestTool();
         var parameters = new Dictionary<string, object>();
-        
+
         using var cts = new CancellationTokenSource();
         cts.CancelAfter(50); // Cancel after 50ms
-        
+
         var result = await tool.ExecuteAsync(parameters, cts.Token);
 
         Assert.False(result.Success);

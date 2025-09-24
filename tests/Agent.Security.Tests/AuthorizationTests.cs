@@ -17,10 +17,10 @@ public class AuthorizationTests : IDisposable
     public AuthorizationTests()
     {
         var services = new ServiceCollection();
-        
+
         // Add logging
         services.AddLogging();
-        
+
         // Add authorization services with Agent policies
         services.AddAgentAuthorization();
 

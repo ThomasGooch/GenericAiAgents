@@ -68,7 +68,7 @@ public class SemanticKernelAIService : IAIService
             _configuration = configuration;
             _isInitialized = true;
 
-            _logger.LogInformation("AI service initialized with provider: {Provider}, Model: {ModelId}", 
+            _logger.LogInformation("AI service initialized with provider: {Provider}, Model: {ModelId}",
                 configuration.Provider, configuration.ModelId);
 
             await Task.CompletedTask;
@@ -126,7 +126,7 @@ public class SemanticKernelAIService : IAIService
                 }
             }
 
-            _logger.LogDebug("AI completion successful. Tokens: {Tokens}, Duration: {Duration}ms", 
+            _logger.LogDebug("AI completion successful. Tokens: {Tokens}, Duration: {Duration}ms",
                 tokensUsed, stopwatch.ElapsedMilliseconds);
 
             return AIResponse.CreateSuccess(

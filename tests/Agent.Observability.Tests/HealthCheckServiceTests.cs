@@ -79,7 +79,7 @@ public class HealthCheckServiceTests
         // Arrange
         var healthyAgent = Substitute.For<IAgent>();
         var unhealthyAgent = Substitute.For<IAgent>();
-        
+
         healthyAgent.Id.Returns("healthy-agent");
         unhealthyAgent.Id.Returns("unhealthy-agent");
 
@@ -205,10 +205,10 @@ public class HealthCheckServiceTests
 
         // Act
         await _healthCheckService.StartPeriodicHealthChecksAsync(interval);
-        
+
         // Wait a bit to allow multiple checks
         await Task.Delay(350);
-        
+
         await _healthCheckService.StopPeriodicHealthChecksAsync();
 
         // Assert
@@ -222,10 +222,10 @@ public class HealthCheckServiceTests
         // Arrange
         var slowAgent = Substitute.For<IAgent>();
         slowAgent.Id.Returns("slow-agent");
-        
+
         var agents = new List<IAgent> { slowAgent };
         _mockAgentRegistry.GetAllAgentsAsync().Returns(agents);
-        
+
         // Simulate a slow health check
         _mockAgentRegistry.CheckHealthAsync("slow-agent").Returns(async (callInfo) =>
         {

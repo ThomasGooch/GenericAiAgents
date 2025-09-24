@@ -53,7 +53,7 @@ public class OktaJwtTokenProvider : IJwtTokenProvider
             }
 
             var principal = _tokenHandler.ValidateToken(token, _validationParameters!, out var validatedToken);
-            
+
             if (validatedToken is not JwtSecurityToken jwtToken)
             {
                 return new JwtValidationResult
@@ -125,12 +125,12 @@ public class OktaJwtTokenProvider : IJwtTokenProvider
 
             // Call Okta Users API to get user information
             var userEndpoint = $"{_options.Domain}/api/v1/users/{userId}";
-            
+
             using var request = new HttpRequestMessage(HttpMethod.Get, userEndpoint);
             request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("SSWS", _options.ApiToken);
 
             var response = await _httpClient.SendAsync(request, cancellationToken);
-            
+
             if (!response.IsSuccessStatusCode)
             {
                 if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
@@ -138,14 +138,14 @@ public class OktaJwtTokenProvider : IJwtTokenProvider
                     _logger.LogWarning("User not found in Okta: {UserId}", userId);
                     return null;
                 }
-                
+
                 _logger.LogError("Failed to get user info from Okta. Status: {StatusCode}", response.StatusCode);
                 return null;
             }
 
             var jsonContent = await response.Content.ReadAsStringAsync(cancellationToken);
             var oktaUser = JsonSerializer.Deserialize<OktaUser>(jsonContent);
-            
+
             if (oktaUser == null)
             {
                 _logger.LogError("Failed to deserialize Okta user response");
@@ -189,7 +189,7 @@ public class OktaJwtTokenProvider : IJwtTokenProvider
             // Get Okta's public keys for token validation
             var keysEndpoint = $"{_options.Domain}/oauth2/{_options.AuthorizationServerId}/v1/keys";
             var keysResponse = await _httpClient.GetAsync(keysEndpoint, cancellationToken);
-            
+
             if (!keysResponse.IsSuccessStatusCode)
             {
                 throw new InvalidOperationException($"Failed to get Okta public keys. Status: {keysResponse.StatusCode}");
@@ -232,12 +232,12 @@ public class OktaJwtTokenProvider : IJwtTokenProvider
             }
 
             var groupsEndpoint = $"{_options.Domain}/api/v1/users/{userId}/groups";
-            
+
             using var request = new HttpRequestMessage(HttpMethod.Get, groupsEndpoint);
             request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("SSWS", _options.ApiToken);
 
             var response = await _httpClient.SendAsync(request, cancellationToken);
-            
+
             if (!response.IsSuccessStatusCode)
             {
                 _logger.LogWarning("Failed to get user groups from Okta. Status: {StatusCode}", response.StatusCode);
@@ -246,7 +246,7 @@ public class OktaJwtTokenProvider : IJwtTokenProvider
 
             var jsonContent = await response.Content.ReadAsStringAsync(cancellationToken);
             var groups = JsonSerializer.Deserialize<List<OktaGroup>>(jsonContent) ?? new List<OktaGroup>();
-            
+
             return groups.Select(g => g.Profile.Name).ToList();
         }
         catch (Exception ex)

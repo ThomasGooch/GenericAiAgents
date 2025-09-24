@@ -100,7 +100,7 @@ public class FileSystemTool : BaseTool
             }
 
             await File.WriteAllTextAsync(path, content, cancellationToken);
-            
+
             var result = new
             {
                 Operation = "write",

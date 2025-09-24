@@ -24,7 +24,7 @@ public static class ServiceCollectionExtensions
         Action<SecretManagerOptions>? configureOptions = null)
     {
         // Configure options
-        services.Configure<SecretManagerOptions>(options => 
+        services.Configure<SecretManagerOptions>(options =>
         {
             configuration.GetSection("SecretManagement").Bind(options);
             configureOptions?.Invoke(options);

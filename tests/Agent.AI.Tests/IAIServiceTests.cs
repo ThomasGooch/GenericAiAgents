@@ -11,7 +11,7 @@ public class IAIServiceTests
     {
         // This test verifies the interface contract exists
         var aiService = Substitute.For<IAIService>();
-        
+
         Assert.NotNull(aiService);
     }
 
@@ -20,11 +20,11 @@ public class IAIServiceTests
     {
         var aiService = Substitute.For<IAIService>();
         var response = AIResponse.CreateSuccess("Test response", 50, "gpt-4", TimeSpan.FromSeconds(1));
-        
+
         aiService.GetCompletionAsync("Test prompt").Returns(response);
-        
+
         var result = await aiService.GetCompletionAsync("Test prompt");
-        
+
         Assert.NotNull(result);
         Assert.Equal("Test response", result.Content);
         Assert.True(result.IsSuccess);
@@ -34,11 +34,11 @@ public class IAIServiceTests
     public async Task IsConfiguredAsync_ShouldReturnConfigurationStatus()
     {
         var aiService = Substitute.For<IAIService>();
-        
+
         aiService.IsConfiguredAsync().Returns(true);
-        
+
         var result = await aiService.IsConfiguredAsync();
-        
+
         Assert.True(result);
     }
 
@@ -47,9 +47,9 @@ public class IAIServiceTests
     {
         var aiService = Substitute.For<IAIService>();
         var config = new AIConfiguration { ModelId = "gpt-4" };
-        
+
         await aiService.InitializeAsync(config);
-        
+
         await aiService.Received(1).InitializeAsync(config);
     }
 }

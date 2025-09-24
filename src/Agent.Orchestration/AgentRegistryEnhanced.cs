@@ -33,12 +33,12 @@ public class AgentRegistryEnhanced : IAgentRegistryEnhanced, IDisposable
             throw new ArgumentNullException(nameof(agent));
 
         _agents[agent.Id] = agent;
-        
+
         // Fire registration event
-        AgentRegistered?.Invoke(this, new AgentRegisteredEventArgs 
-        { 
-            AgentId = agent.Id, 
-            Agent = agent 
+        AgentRegistered?.Invoke(this, new AgentRegisteredEventArgs
+        {
+            AgentId = agent.Id,
+            Agent = agent
         });
 
         return Task.CompletedTask;
@@ -63,15 +63,15 @@ public class AgentRegistryEnhanced : IAgentRegistryEnhanced, IDisposable
     public Task<bool> UnregisterAgentAsync(string agentId, CancellationToken cancellationToken = default)
     {
         var removed = _agents.TryRemove(agentId, out _);
-        
+
         if (removed)
         {
             _healthCache.TryRemove(agentId, out _);
-            
+
             // Fire unregistration event
-            AgentUnregistered?.Invoke(this, new AgentUnregisteredEventArgs 
-            { 
-                AgentId = agentId 
+            AgentUnregistered?.Invoke(this, new AgentUnregisteredEventArgs
+            {
+                AgentId = agentId
             });
         }
 
@@ -88,7 +88,7 @@ public class AgentRegistryEnhanced : IAgentRegistryEnhanced, IDisposable
         try
         {
             var health = await agent.CheckHealthAsync(cancellationToken);
-            
+
             // Update cache and check for changes
             if (_healthCache.TryGetValue(agentId, out var previousHealth))
             {
@@ -102,7 +102,7 @@ public class AgentRegistryEnhanced : IAgentRegistryEnhanced, IDisposable
                     });
                 }
             }
-            
+
             _healthCache[agentId] = health;
             return health;
         }
@@ -114,7 +114,7 @@ public class AgentRegistryEnhanced : IAgentRegistryEnhanced, IDisposable
                 Message = $"Health check failed: {ex.Message}",
                 Timestamp = DateTime.UtcNow
             };
-            
+
             _healthCache[agentId] = health;
             return health;
         }
@@ -123,7 +123,7 @@ public class AgentRegistryEnhanced : IAgentRegistryEnhanced, IDisposable
     public async Task<IEnumerable<IAgent>> GetHealthyAgentsAsync(CancellationToken cancellationToken = default)
     {
         var healthyAgents = new List<IAgent>();
-        
+
         foreach (var kvp in _agents)
         {
             var health = await CheckHealthAsync(kvp.Key, cancellationToken);
@@ -132,22 +132,22 @@ public class AgentRegistryEnhanced : IAgentRegistryEnhanced, IDisposable
                 healthyAgents.Add(kvp.Value);
             }
         }
-        
+
         return healthyAgents;
     }
 
     public async Task<IEnumerable<IAgent>> GetAgentsByHealthAsync(HealthLevel healthLevel, CancellationToken cancellationToken = default)
     {
         var filteredAgents = new List<IAgent>();
-        
+
         foreach (var kvp in _agents)
         {
             var health = await CheckHealthAsync(kvp.Key, cancellationToken);
-            
+
             if (health != null)
             {
                 var agentHealthLevel = DetermineHealthLevel(health);
-                
+
                 // Include agents at or above the requested health level
                 if (agentHealthLevel >= healthLevel)
                 {
@@ -155,7 +155,7 @@ public class AgentRegistryEnhanced : IAgentRegistryEnhanced, IDisposable
                 }
             }
         }
-        
+
         return filteredAgents;
     }
 
@@ -164,8 +164,8 @@ public class AgentRegistryEnhanced : IAgentRegistryEnhanced, IDisposable
         foreach (var assembly in assemblies)
         {
             var agentTypes = assembly.GetTypes()
-                .Where(type => typeof(IAgent).IsAssignableFrom(type) && 
-                              !type.IsInterface && 
+                .Where(type => typeof(IAgent).IsAssignableFrom(type) &&
+                              !type.IsInterface &&
                               !type.IsAbstract)
                 .ToList();
 
@@ -201,7 +201,7 @@ public class AgentRegistryEnhanced : IAgentRegistryEnhanced, IDisposable
         {
             if (_disposed)
                 throw new ObjectDisposedException(nameof(AgentRegistryEnhanced));
-                
+
             if (_healthMonitoringActive)
                 return Task.CompletedTask;
 
@@ -262,9 +262,9 @@ public class AgentRegistryEnhanced : IAgentRegistryEnhanced, IDisposable
 
         try
         {
-            var healthCheckTasks = _agents.Keys.Select(agentId => 
+            var healthCheckTasks = _agents.Keys.Select(agentId =>
                 CheckHealthAsync(agentId, CancellationToken.None));
-            
+
             await Task.WhenAll(healthCheckTasks);
         }
         catch (Exception)
@@ -279,9 +279,9 @@ public class AgentRegistryEnhanced : IAgentRegistryEnhanced, IDisposable
         {
             return health.ResponseTime.TotalSeconds > 5 ? HealthLevel.Warning : HealthLevel.Healthy;
         }
-        
-        return health.Message.Contains("disposed", StringComparison.OrdinalIgnoreCase) 
-            ? HealthLevel.Critical 
+
+        return health.Message.Contains("disposed", StringComparison.OrdinalIgnoreCase)
+            ? HealthLevel.Critical
             : HealthLevel.Unhealthy;
     }
 
@@ -301,8 +301,8 @@ public class AgentRegistryEnhanced : IAgentRegistryEnhanced, IDisposable
         }
 
         summary.UnknownHealthAgents = summary.TotalAgents - summary.HealthyAgents - summary.UnhealthyAgents;
-        summary.HealthPercentage = summary.TotalAgents > 0 
-            ? (double)summary.HealthyAgents / summary.TotalAgents * 100 
+        summary.HealthPercentage = summary.TotalAgents > 0
+            ? (double)summary.HealthyAgents / summary.TotalAgents * 100
             : 0;
 
         summary.OverallStatus = summary.HealthPercentage switch

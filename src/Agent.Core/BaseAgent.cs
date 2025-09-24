@@ -22,18 +22,18 @@ public abstract class BaseAgent : IAgent
     public virtual async Task InitializeAsync(AgentConfiguration configuration, CancellationToken cancellationToken = default)
     {
         ThrowIfDisposed();
-        
+
         Configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
-        
+
         await OnInitializeAsync(configuration, cancellationToken);
-        
+
         IsInitialized = true;
     }
 
     public async Task<AgentResult> ExecuteAsync(AgentRequest request, CancellationToken cancellationToken = default)
     {
         ThrowIfDisposed();
-        
+
         if (!IsInitialized)
         {
             throw new InvalidOperationException("Agent has not been initialized. Call InitializeAsync first.");
@@ -51,7 +51,7 @@ public abstract class BaseAgent : IAgent
                 cancellationToken, timeoutCts.Token);
 
             var result = await ExecuteInternalAsync(request, linkedCts.Token);
-            
+
             return result ?? AgentResult.CreateError("ExecuteInternalAsync returned null result");
         }
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
@@ -76,11 +76,11 @@ public abstract class BaseAgent : IAgent
     public virtual Task<AgentHealthStatus> CheckHealthAsync(CancellationToken cancellationToken = default)
     {
         var startTime = DateTime.UtcNow;
-        
+
         try
         {
             ThrowIfDisposed();
-            
+
             var health = new AgentHealthStatus
             {
                 IsHealthy = IsInitialized,
@@ -88,11 +88,11 @@ public abstract class BaseAgent : IAgent
                 Timestamp = DateTime.UtcNow,
                 ResponseTime = DateTime.UtcNow - startTime
             };
-            
+
             health.Metrics["IsInitialized"] = IsInitialized;
             health.Metrics["AgentId"] = Id;
             health.Metrics["AgentName"] = Name;
-            
+
             return Task.FromResult(health);
         }
         catch (ObjectDisposedException)

@@ -24,10 +24,10 @@ public class HealthCheckService : IHealthCheckService, IDisposable
     public HealthCheckService(IAgentRegistryEnhanced agentRegistry)
     {
         _agentRegistry = agentRegistry ?? throw new ArgumentNullException(nameof(agentRegistry));
-        
+
         // Register built-in health checks
         RegisterBuiltInHealthChecks();
-        
+
         // Initialize timer (disabled by default)
         _periodicTimer = new Timer(PeriodicHealthCheckCallback, null, Timeout.Infinite, Timeout.Infinite);
     }
@@ -36,7 +36,7 @@ public class HealthCheckService : IHealthCheckService, IDisposable
     {
         var stopwatch = Stopwatch.StartNew();
         var effectiveTimeout = timeout ?? TimeSpan.FromSeconds(30);
-        
+
         using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
         cts.CancelAfter(effectiveTimeout);
 
@@ -49,10 +49,10 @@ public class HealthCheckService : IHealthCheckService, IDisposable
         {
             // Check agents
             await CheckAgentHealthAsync(systemHealth, cts.Token);
-            
+
             // Check custom health checks
             await CheckCustomHealthChecksAsync(systemHealth, cts.Token);
-            
+
             // Check system resources
             await CheckSystemResourcesAsync(systemHealth, cts.Token);
 
@@ -100,7 +100,7 @@ public class HealthCheckService : IHealthCheckService, IDisposable
     public async Task<ComponentHealthStatus> CheckComponentHealthAsync(string componentName, CancellationToken cancellationToken = default)
     {
         var stopwatch = Stopwatch.StartNew();
-        
+
         try
         {
             // Check if it's a registered health check
@@ -110,7 +110,7 @@ public class HealthCheckService : IHealthCheckService, IDisposable
                 cts.CancelAfter(healthCheck.Timeout);
 
                 var result = await healthCheck.CheckHealthAsync(cts.Token);
-                
+
                 return new ComponentHealthStatus
                 {
                     Name = componentName,
@@ -158,7 +158,7 @@ public class HealthCheckService : IHealthCheckService, IDisposable
     public async Task<HealthReport> GetHealthReportAsync(CancellationToken cancellationToken = default)
     {
         var stopwatch = Stopwatch.StartNew();
-        
+
         var report = new HealthReport
         {
             Timestamp = DateTime.UtcNow
@@ -168,7 +168,7 @@ public class HealthCheckService : IHealthCheckService, IDisposable
         {
             // Get system health
             report.SystemHealth = await CheckSystemHealthAsync(null, cancellationToken);
-            
+
             // Get metrics (if available)
             // This would typically be injected, but for simplicity we'll create basic metrics
             report.Metrics = new MetricsSummary
@@ -251,13 +251,13 @@ public class HealthCheckService : IHealthCheckService, IDisposable
         try
         {
             var agents = await _agentRegistry.GetAllAgentsAsync(cancellationToken);
-            
+
             foreach (var agent in agents)
             {
                 try
                 {
                     var agentHealth = await _agentRegistry.CheckHealthAsync(agent.Id, cancellationToken);
-                    
+
                     systemHealth.ComponentHealth[agent.Id] = new ComponentHealthStatus
                     {
                         Name = agent.Id,
@@ -302,7 +302,7 @@ public class HealthCheckService : IHealthCheckService, IDisposable
                 cts.CancelAfter(kvp.Value.Timeout);
 
                 var result = await kvp.Value.CheckHealthAsync(cts.Token);
-                
+
                 var componentHealth = new ComponentHealthStatus
                 {
                     Name = kvp.Key,
@@ -341,7 +341,7 @@ public class HealthCheckService : IHealthCheckService, IDisposable
         });
 
         var results = await Task.WhenAll(healthCheckTasks);
-        
+
         foreach (var (name, health) in results)
         {
             systemHealth.ComponentHealth[name] = health;
@@ -352,10 +352,10 @@ public class HealthCheckService : IHealthCheckService, IDisposable
     {
         // Check memory
         systemHealth.ComponentHealth["memory"] = CheckMemoryHealth();
-        
+
         // Check disk space
         systemHealth.ComponentHealth["disk"] = CheckDiskHealth();
-        
+
         // Check CPU usage
         systemHealth.ComponentHealth["cpu"] = CheckCpuHealth();
 
@@ -367,7 +367,7 @@ public class HealthCheckService : IHealthCheckService, IDisposable
         // Placeholder for database health check
         // In a real implementation, this would test database connectivity
         await Task.Delay(10, cancellationToken);
-        
+
         return new ComponentHealthStatus
         {
             Name = "database",
@@ -386,7 +386,7 @@ public class HealthCheckService : IHealthCheckService, IDisposable
     {
         var memoryUsage = GC.GetTotalMemory(false);
         var isHealthy = memoryUsage < 1024 * 1024 * 1024; // 1GB threshold
-        
+
         return new ComponentHealthStatus
         {
             Name = "memory",
@@ -408,7 +408,7 @@ public class HealthCheckService : IHealthCheckService, IDisposable
         {
             var drives = DriveInfo.GetDrives().Where(d => d.IsReady);
             var criticalDrives = new List<string>();
-            
+
             foreach (var drive in drives)
             {
                 var freeSpacePercentage = (double)drive.AvailableFreeSpace / drive.TotalSize * 100;
@@ -422,8 +422,8 @@ public class HealthCheckService : IHealthCheckService, IDisposable
             {
                 Name = "disk",
                 IsHealthy = !criticalDrives.Any(),
-                Message = criticalDrives.Any() 
-                    ? $"Low disk space on drives: {string.Join(", ", criticalDrives)}" 
+                Message = criticalDrives.Any()
+                    ? $"Low disk space on drives: {string.Join(", ", criticalDrives)}"
                     : "Disk space is healthy",
                 Details = drives.ToDictionary<DriveInfo, string, object>(d => d.Name, d => new
                 {
@@ -449,7 +449,7 @@ public class HealthCheckService : IHealthCheckService, IDisposable
     {
         var cpuUsage = GetCpuUsage();
         var isHealthy = cpuUsage < 80; // 80% threshold
-        
+
         return new ComponentHealthStatus
         {
             Name = "cpu",
@@ -491,8 +491,8 @@ public class HealthCheckService : IHealthCheckService, IDisposable
 
     private async Task CheckForHealthStatusChangesAsync(SystemHealthStatus currentStatus)
     {
-        if (_lastHealthStatus != null && 
-            (_lastHealthStatus.IsHealthy != currentStatus.IsHealthy || 
+        if (_lastHealthStatus != null &&
+            (_lastHealthStatus.IsHealthy != currentStatus.IsHealthy ||
              _lastHealthStatus.OverallStatus != currentStatus.OverallStatus))
         {
             var changedComponents = currentStatus.ComponentHealth.Keys

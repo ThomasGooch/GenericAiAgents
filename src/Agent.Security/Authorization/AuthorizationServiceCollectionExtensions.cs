@@ -23,7 +23,7 @@ public static class AuthorizationServiceCollectionExtensions
         {
             // Configure standard Agent authorization policies
             AuthorizationPolicies.ConfigurePolicies(options);
-            
+
             // Allow additional configuration
             configureOptions?.Invoke(options);
         });

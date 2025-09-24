@@ -43,20 +43,20 @@ public class SecretConfigurationProvider : ConfigurationProvider
                     if (secretValue != null)
                     {
                         Data[secretMapping.ConfigurationKey] = secretValue;
-                        _logger.LogDebug("Loaded secret '{SecretName}' into configuration key '{ConfigKey}'", 
+                        _logger.LogDebug("Loaded secret '{SecretName}' into configuration key '{ConfigKey}'",
                             secretMapping.SecretName, secretMapping.ConfigurationKey);
                     }
                     else
                     {
-                        _logger.LogWarning("Secret '{SecretName}' not found for configuration key '{ConfigKey}'", 
+                        _logger.LogWarning("Secret '{SecretName}' not found for configuration key '{ConfigKey}'",
                             secretMapping.SecretName, secretMapping.ConfigurationKey);
                     }
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, "Failed to load secret '{SecretName}' for configuration key '{ConfigKey}'", 
+                    _logger.LogError(ex, "Failed to load secret '{SecretName}' for configuration key '{ConfigKey}'",
                         secretMapping.SecretName, secretMapping.ConfigurationKey);
-                    
+
                     if (_source.FailOnMissingSecrets)
                     {
                         throw;

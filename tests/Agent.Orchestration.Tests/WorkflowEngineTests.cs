@@ -40,7 +40,7 @@ public class WorkflowEngineTests
 
         _mockAgent1.ProcessAsync(Arg.Any<AgentRequest>(), Arg.Any<CancellationToken>())
                   .Returns(new AgentResult { Success = true, Output = "Agent 1 result" });
-        
+
         _mockAgent2.ProcessAsync(Arg.Any<AgentRequest>(), Arg.Any<CancellationToken>())
                   .Returns(new AgentResult { Success = true, Output = "Agent 2 result" });
 
@@ -56,7 +56,7 @@ public class WorkflowEngineTests
         Assert.Equal(2, result.StepResults.Count);
         Assert.Equal("Agent 1 result", result.StepResults[0].Output);
         Assert.Equal("Agent 2 result", result.StepResults[1].Output);
-        
+
         Received.InOrder(() =>
         {
             _mockAgent1.ProcessAsync(Arg.Any<AgentRequest>(), Arg.Any<CancellationToken>());
@@ -88,7 +88,7 @@ public class WorkflowEngineTests
 
         _mockAgent1.ProcessAsync(Arg.Any<AgentRequest>(), Arg.Any<CancellationToken>())
                   .Returns(tcs1.Task);
-        
+
         _mockAgent2.ProcessAsync(Arg.Any<AgentRequest>(), Arg.Any<CancellationToken>())
                   .Returns(tcs2.Task);
 
@@ -98,17 +98,17 @@ public class WorkflowEngineTests
 
         // Act
         var workflowTask = _workflowEngine.ExecuteWorkflowAsync(workflow, CancellationToken.None);
-        
+
         // Complete both agents simultaneously
         tcs1.SetResult(new AgentResult { Success = true, Output = "Agent 1 result" });
         tcs2.SetResult(new AgentResult { Success = true, Output = "Agent 2 result" });
-        
+
         var result = await workflowTask;
 
         // Assert
         Assert.True(result.Success);
         Assert.Equal(2, result.StepResults.Count);
-        
+
         // Verify both agents were called concurrently
         await _mockAgent1.Received(1).ProcessAsync(Arg.Any<AgentRequest>(), Arg.Any<CancellationToken>());
         await _mockAgent2.Received(1).ProcessAsync(Arg.Any<AgentRequest>(), Arg.Any<CancellationToken>());
@@ -147,7 +147,7 @@ public class WorkflowEngineTests
         Assert.False(result.Success);
         Assert.Single(result.StepResults);
         Assert.Contains("Agent 1 failed", result.Error);
-        
+
         // Agent 2 should not have been called
         await _mockAgent2.DidNotReceive().ProcessAsync(Arg.Any<AgentRequest>(), Arg.Any<CancellationToken>());
     }

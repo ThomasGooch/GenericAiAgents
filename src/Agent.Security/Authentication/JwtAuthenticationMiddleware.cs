@@ -38,7 +38,7 @@ public class JwtAuthenticationMiddleware
 
         // Extract token from Authorization header
         var token = ExtractToken(context.Request);
-        
+
         if (string.IsNullOrEmpty(token))
         {
             _logger.LogDebug("No JWT token found in request to {Path}", context.Request.Path);
@@ -50,27 +50,27 @@ public class JwtAuthenticationMiddleware
         {
             // Get the JWT token provider from DI
             var tokenProvider = context.RequestServices.GetRequiredService<IJwtTokenProvider>();
-            
+
             // Validate the token
             var validationResult = await tokenProvider.ValidateTokenAsync(token, context.RequestAborted);
-            
+
             if (validationResult.IsValid)
             {
                 // Create claims identity and set user context
                 var identity = new ClaimsIdentity(validationResult.Claims, "jwt");
                 context.User = new ClaimsPrincipal(identity);
-                
+
                 // Add user information to context for easy access
                 context.Items["UserId"] = validationResult.UserId;
                 context.Items["UserRoles"] = validationResult.Roles;
                 context.Items["TokenExpiration"] = validationResult.ExpiresAt;
 
-                _logger.LogDebug("Successfully authenticated user {UserId} for request to {Path}", 
+                _logger.LogDebug("Successfully authenticated user {UserId} for request to {Path}",
                     validationResult.UserId, context.Request.Path);
             }
             else
             {
-                _logger.LogWarning("JWT token validation failed for request to {Path}: {Error}", 
+                _logger.LogWarning("JWT token validation failed for request to {Path}: {Error}",
                     context.Request.Path, validationResult.ErrorMessage);
 
                 // For invalid tokens, we don't set the user context
@@ -114,8 +114,8 @@ public class JwtAuthenticationMiddleware
 
     private static bool IsHealthCheckEndpoint(PathString path)
     {
-        return path.StartsWithSegments("/health") || 
-               path.StartsWithSegments("/healthz") || 
+        return path.StartsWithSegments("/health") ||
+               path.StartsWithSegments("/healthz") ||
                path.StartsWithSegments("/ready") ||
                path.StartsWithSegments("/live");
     }

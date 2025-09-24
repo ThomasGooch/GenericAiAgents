@@ -23,7 +23,7 @@ public static class ServiceCollectionExtensions
         ArgumentNullException.ThrowIfNull(services);
 
         services.AddAgentToolRegistry();
-        
+
         return services;
     }
 
@@ -43,7 +43,7 @@ public static class ServiceCollectionExtensions
         }
 
         services.AddScoped<IAIService, SemanticKernelAIService>();
-        
+
         return services;
     }
 
@@ -57,7 +57,7 @@ public static class ServiceCollectionExtensions
         ArgumentNullException.ThrowIfNull(services);
 
         services.AddSingleton<IToolRegistry, ToolRegistry>();
-        
+
         return services;
     }
 
@@ -79,7 +79,7 @@ public static class ServiceCollectionExtensions
         {
             services.Configure<AIConfiguration>(configuration.GetSection("AI"));
         }
-        
+
         return services;
     }
 
@@ -109,7 +109,7 @@ public static class ServiceCollectionExtensions
             config.TimeoutSeconds = aiConfiguration.TimeoutSeconds;
             config.AdditionalSettings = aiConfiguration.AdditionalSettings;
         });
-        
+
         return services;
     }
 
@@ -128,7 +128,7 @@ public static class ServiceCollectionExtensions
         services.AddAgentAI();
 
         services.Configure(configureAI);
-        
+
         return services;
     }
 
@@ -142,7 +142,7 @@ public static class ServiceCollectionExtensions
         ArgumentNullException.ThrowIfNull(services);
 
         services.AddHostedService<ToolDiscoveryHostedService>();
-        
+
         return services;
     }
 }

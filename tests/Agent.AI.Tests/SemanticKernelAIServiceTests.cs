@@ -18,7 +18,7 @@ public class SemanticKernelAIServiceTests
     public void SemanticKernelAIService_ShouldHaveRequiredProperties()
     {
         var aiService = new SemanticKernelAIService(_logger);
-        
+
         Assert.NotNull(aiService);
     }
 
