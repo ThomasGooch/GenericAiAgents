@@ -4,6 +4,43 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    
+    <!-- Package Identity -->
+    <PackageId>GenericAgents.Core</PackageId>
+    <Version>1.0.0</Version>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <FileVersion>1.0.0.0</FileVersion>
+    
+    <!-- Package Metadata -->
+    <Title>Generic AI Agent System - Core</Title>
+    <Authors>Thomas Gooch</Authors>
+    <Company>Generic Agents</Company>
+    <Product>Generic AI Agent System</Product>
+    <Description>Core abstractions and base classes for building enterprise-grade AI agent systems with .NET 8. Provides foundational interfaces, models, and base implementations for intelligent agent workflows.</Description>
+    
+    <!-- Package Details -->
+    <PackageTags>ai;agents;workflow;orchestration;dotnet;semantic-kernel;enterprise;core;abstractions</PackageTags>
+    <PackageProjectUrl>https://github.com/thomas-gooch/generic-agents</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/thomas-gooch/generic-agents</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    
+    <!-- Documentation -->
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageIcon>icon.png</PackageIcon>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    
+    <!-- Build Configuration -->
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
   </PropertyGroup>
+  
+  <!-- Package Files -->
+  <ItemGroup>
+    <None Include="../../README.md" Pack="true" PackagePath="\" />
+    <None Include="../../assets/icon.png" Pack="true" PackagePath="\" />
+  </ItemGroup>
 
 </Project>
