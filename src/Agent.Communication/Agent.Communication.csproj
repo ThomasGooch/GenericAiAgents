@@ -14,9 +14,9 @@
     <Title>Generic AI Agent System - Communication</Title>
     <Description>Communication abstraction layer supporting multiple channels and protocols for inter-agent messaging and coordination.</Description>
     <PackageTags>ai;agents;communication;messaging;channels;coordination;distributed</PackageTags>
-    <Version>1.0.0</Version>
-    <AssemblyVersion>1.0.0.0</AssemblyVersion>
-    <FileVersion>1.0.0.0</FileVersion>
+    <Version>1.0.1</Version>
+    <AssemblyVersion>1.0.1.0</AssemblyVersion>
+    <FileVersion>1.0.1.0</FileVersion>
     <Authors>Thomas Gooch</Authors>
     <Company>Generic Agents</Company>
     <Product>Generic AI Agent System</Product>
