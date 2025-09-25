@@ -14,9 +14,9 @@
     <Title>Generic AI Agent System - Registry</Title>
     <Description>Tool registry and discovery system for dynamically registering and managing agent tools and capabilities.</Description>
     <PackageTags>ai;agents;registry;discovery;tools;dynamic;plugins;capabilities</PackageTags>
-    <Version>1.0.0</Version>
-    <AssemblyVersion>1.0.0.0</AssemblyVersion>
-    <FileVersion>1.0.0.0</FileVersion>
+    <Version>1.0.1</Version>
+    <AssemblyVersion>1.0.1.0</AssemblyVersion>
+    <FileVersion>1.0.1.0</FileVersion>
     <Authors>Thomas Gooch</Authors>
     <Company>Generic Agents</Company>
     <Product>Generic AI Agent System</Product>
