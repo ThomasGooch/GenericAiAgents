@@ -5,10 +5,15 @@
 **A production-ready, enterprise-grade AI agent orchestration platform built with .NET 8**
 
 [![CI/CD](https://img.shields.io/badge/CI%2FCD-GitHub%20Actions-blue)](/.github/workflows/ci.yml)
-[![Security](https://img.shields.io/badge/Security-Enterprise%20Grade-green)](/.github/workflows/security.yml)
+[![Security](https://img.shields.io/badge/Security-Enterprise%20Grade-green)](#-security-features)
 [![Tests](https://img.shields.io/badge/Tests-All%20Passing-brightgreen)](#testing)
-[![Docker](https://img.shields.io/badge/Docker-Ready-blue)](./Dockerfile)
 [![.NET](https://img.shields.io/badge/.NET-8.0-purple)](https://dotnet.microsoft.com/)
+
+[![NuGet Core](https://img.shields.io/nuget/v/GenericAgents.Core.svg?label=Core)](https://www.nuget.org/packages/GenericAgents.Core/)
+[![NuGet Tools](https://img.shields.io/nuget/v/GenericAgents.Tools.svg?label=Tools)](https://www.nuget.org/packages/GenericAgents.Tools/)
+[![NuGet AI](https://img.shields.io/nuget/v/GenericAgents.AI.svg?label=AI)](https://www.nuget.org/packages/GenericAgents.AI/)
+[![NuGet Security](https://img.shields.io/nuget/v/GenericAgents.Security.svg?label=Security)](https://www.nuget.org/packages/GenericAgents.Security/)
+[![Downloads](https://img.shields.io/nuget/dt/GenericAgents.Core.svg)](https://www.nuget.org/packages/GenericAgents.Core/)
 
 *Transform your applications with intelligent, scalable AI agent workflows*
 
@@ -34,6 +39,74 @@ The **Generic AI Agent System** provides a robust foundation for building intell
 
 ## 🚀 Quick Start
 
+### 📦 **NuGet Packages**
+
+Install individual packages based on your needs:
+
+```bash
+# Core foundation (always required)
+dotnet add package GenericAgents.Core
+
+# Add specific components as needed
+dotnet add package GenericAgents.Tools           # Tool execution framework
+dotnet add package GenericAgents.AI              # AI service integration
+dotnet add package GenericAgents.Security        # JWT auth & RBAC
+dotnet add package GenericAgents.Orchestration   # Workflow engine
+dotnet add package GenericAgents.Observability   # Monitoring & metrics
+dotnet add package GenericAgents.Configuration   # Configuration management
+dotnet add package GenericAgents.Communication   # Inter-agent messaging
+dotnet add package GenericAgents.Registry        # Tool registry & discovery
+dotnet add package GenericAgents.DI              # Dependency injection
+dotnet add package GenericAgents.Tools.Samples   # Example tools
+```
+
+### 💡 **Simple Integration Example**
+
+```csharp
+// Program.cs - Add to your existing .NET application
+builder.Services.AddGenericAgents(configuration =>
+{
+    configuration.UseCore()
+                 .UseTools()
+                 .UseAI("your-openai-api-key")
+                 .UseSecurity();
+});
+
+// Your existing controller enhanced with AI
+[ApiController]
+public class YourController : ControllerBase
+{
+    private readonly IAgentOrchestrator _orchestrator;
+    
+    public YourController(IAgentOrchestrator orchestrator)
+    {
+        _orchestrator = orchestrator;
+    }
+    
+    [HttpPost("/analyze")]
+    public async Task<IActionResult> AnalyzeWithAI(AnalysisRequest request)
+    {
+        // Create AI workflow
+        var workflow = await _orchestrator.CreateWorkflowAsync("analysis", new
+        {
+            data = request.Data,
+            analysisType = request.Type
+        });
+        
+        var result = await workflow.ExecuteAsync();
+        
+        // Combine with your existing business logic
+        var enhancedResult = await YourBusinessLogic(result);
+        
+        return Ok(enhancedResult);
+    }
+}
+```
+
+### 🐳 **Full Platform Setup** (Optional)
+
+For complete platform development:
+
 ### Prerequisites
 - Docker and Docker Compose
 - .NET 8 SDK (for development)
@@ -41,8 +114,8 @@ The **Generic AI Agent System** provides a robust foundation for building intell
 
 ### 1. **Clone and Setup**
 ```bash
-git clone <repository-url>
-cd generic_agents
+git clone https://github.com/thomas-gooch/generic-agents.git
+cd generic-agents
 
 # Generate secure environment variables
 cat > .env << EOF
@@ -576,25 +649,169 @@ curl http://localhost:8080/configuration | jq
 
 ## 🤝 Contributing
 
-We welcome contributions! Please see our [Contributing Guide](./CONTRIBUTING.md) for details.
+**We welcome contributions from the community!** Whether you're fixing bugs, adding features, improving documentation, or sharing your agent tools, your contributions make this project better for everyone.
 
-### **Development Setup**
+### 🌟 **Ways to Contribute**
+
+#### 📝 **Documentation & Examples**
+- Improve existing documentation
+- Add usage examples and tutorials  
+- Create integration guides for popular frameworks
+- Share your use cases and implementation stories
+
+#### 🐛 **Bug Reports & Fixes**
+- Report bugs with detailed reproduction steps
+- Fix existing issues marked as `good first issue` or `help wanted`
+- Improve error messages and handling
+
+#### 🚀 **Feature Development**  
+- Implement requested features from the roadmap
+- Add new tool implementations to `Agent.Tools.Samples`
+- Create new agent types and workflow patterns
+- Enhance security, performance, or monitoring features
+
+#### 🔧 **Tool Contributions**
+We especially welcome new tool implementations! Examples:
+```csharp
+[Tool("database-query")]
+[Description("Executes database queries safely")]
+public class DatabaseTool : BaseTool
+{
+    protected override async Task<ToolResult> ExecuteInternalAsync(
+        Dictionary<string, object> parameters, 
+        CancellationToken cancellationToken)
+    {
+        // Your tool implementation
+        var query = parameters["query"].ToString();
+        var result = await ExecuteQuerySafely(query);
+        return ToolResult.CreateSuccess(result);
+    }
+}
+```
+
+### 🚀 **Getting Started**
+
+#### **1. Development Setup**
 ```bash
-# Clone the repository
-git clone <repository-url>
-cd generic_agents
+# Fork and clone the repository
+git clone https://github.com/YOUR_USERNAME/generic-agents.git
+cd generic-agents
 
-# Install .NET 8 SDK
+# Create a feature branch
+git checkout -b feature/your-feature-name
+
 # Setup development environment
 dotnet restore
 dotnet build
 
-# Run tests
+# Run tests to ensure everything works
 dotnet test
 
-# Start development services
+# Start development services (optional)
 docker-compose -f docker-compose.dev.yml up -d
 ```
+
+#### **2. Development Workflow**
+```bash
+# Make your changes
+# Write/update tests for your changes
+dotnet test
+
+# Ensure code quality
+dotnet format
+dotnet build --configuration Release
+
+# Commit your changes
+git add .
+git commit -m "feat: add your feature description"
+
+# Push and create pull request
+git push origin feature/your-feature-name
+```
+
+### 📋 **Contribution Guidelines**
+
+#### **✅ Code Standards**
+- **Follow .NET conventions**: Use standard C# naming and formatting
+- **Write tests**: All new features must include unit tests
+- **Documentation**: Update XML docs for public APIs
+- **Security**: Never commit secrets or sensitive data
+
+#### **✅ Pull Request Process**
+1. **Create focused PRs**: One feature/fix per pull request
+2. **Write descriptive titles**: Use conventional commits (`feat:`, `fix:`, `docs:`, etc.)
+3. **Include tests**: Ensure your code is tested and CI passes
+4. **Update documentation**: Include relevant documentation updates
+5. **Link issues**: Reference any related GitHub issues
+
+#### **✅ Issue Reporting**
+When reporting bugs, please include:
+- **Environment**: OS, .NET version, package versions
+- **Reproduction steps**: Clear steps to reproduce the issue
+- **Expected vs actual behavior**: What should happen vs what happens
+- **Logs/errors**: Any relevant error messages or logs
+
+### 🎯 **Good First Issues**
+
+New to the project? Look for these labels:
+- `good first issue`: Perfect for newcomers
+- `help wanted`: Community input needed
+- `documentation`: Documentation improvements
+- `samples`: New example implementations
+
+### 💬 **Community Guidelines**
+
+#### **🤝 Code of Conduct**
+- Be respectful and inclusive to all contributors
+- Provide constructive feedback on pull requests
+- Help newcomers get started with the project
+- Follow the [Contributor Covenant](https://www.contributor-covenant.org/)
+
+#### **🗣️ Communication Channels**
+- **🐛 Bug Reports**: [GitHub Issues](../../issues)
+- **💡 Feature Requests**: [GitHub Issues](../../issues) with `enhancement` label
+- **💬 General Discussion**: [GitHub Discussions](../../discussions)
+- **📧 Security Issues**: Report privately via email
+
+### 🏆 **Recognition**
+
+Contributors will be:
+- Listed in our [CONTRIBUTORS.md](./CONTRIBUTORS.md) file
+- Recognized in release notes for significant contributions
+- Invited to join our contributor Discord community
+- Eligible for "Contributor" badges on their GitHub profiles
+
+### 📚 **Resources for Contributors**
+
+#### **Development Resources**
+- [Architecture Guide](./docs/architecture.md) - Understanding the system design
+- [API Documentation](./docs/api.md) - Complete API reference
+- [Testing Guide](./docs/testing.md) - Writing and running tests
+- [Security Guide](./docs/security.md) - Security best practices
+
+#### **Useful Commands**
+```bash
+# Generate project documentation
+dotnet build --configuration Release
+dotnet tool install -g Microsoft.dotnet-openapi
+
+# Run specific test categories
+dotnet test --filter "Category=Unit"
+dotnet test --filter "Category=Integration"
+
+# Check code coverage
+dotnet test --collect:"XPlat Code Coverage"
+
+# Format code
+dotnet format
+
+# Security scan
+dotnet list package --vulnerable
+```
+
+**🙏 Thank you for contributing to the Generic AI Agent System!**
+
+Your contributions help build the future of AI agent orchestration for the .NET community.
 
 ---
 
