@@ -114,7 +114,7 @@ For complete platform development:
 
 ### 1. **Clone and Setup**
 ```bash
-git clone https://github.com/thomas-gooch/generic-agents.git
+git clone https://github.com/ThomasGooch/GenericAiAgents.git
 cd generic-agents
 
 # Generate secure environment variables

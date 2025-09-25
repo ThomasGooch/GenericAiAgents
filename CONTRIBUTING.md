@@ -72,7 +72,7 @@ public class YourTool : BaseTool
 
 1. **Fork the repository**
    ```bash
-   # Go to https://github.com/thomas-gooch/generic-agents and click "Fork"
+   # Go to https://github.com/ThomasGooch/GenericAiAgents and click "Fork"
    ```
 
 2. **Clone your fork**
@@ -83,7 +83,7 @@ public class YourTool : BaseTool
 
 3. **Set up upstream remote**
    ```bash
-   git remote add upstream https://github.com/thomas-gooch/generic-agents.git
+   git remote add upstream https://github.com/ThomasGooch/GenericAiAgents.git
    ```
 
 4. **Install dependencies**
