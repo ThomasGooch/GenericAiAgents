@@ -1,0 +1,122 @@
+name: ❓ Question
+description: Ask a question about usage, integration, or best practices
+title: "[QUESTION] "
+labels: ["question", "needs-triage"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Have a question about using the Generic AI Agent System? We're here to help!
+        
+        **Before asking:** Please check our [documentation](../docs/) and search [existing issues](../../issues) and [discussions](../../discussions) first.
+
+  - type: dropdown
+    id: category
+    attributes:
+      label: Question Category
+      description: What type of question is this?
+      options:
+        - Usage - How to use a feature
+        - Integration - How to integrate with other systems
+        - Best Practices - Recommended approaches
+        - Architecture - System design questions
+        - Performance - Optimization questions
+        - Security - Security-related questions
+        - Troubleshooting - Help with issues
+        - Other
+    validations:
+      required: true
+
+  - type: dropdown
+    id: component
+    attributes:
+      label: Related Component
+      description: Which component is your question about?
+      options:
+        - Core (Agent.Core)
+        - Tools (Agent.Tools)
+        - AI Integration (Agent.AI)
+        - Security (Agent.Security)
+        - Orchestration (Agent.Orchestration)
+        - Observability (Agent.Observability)
+        - Configuration (Agent.Configuration)
+        - Communication (Agent.Communication)
+        - Registry (Agent.Registry)
+        - Dependency Injection (Agent.DI)
+        - Samples (Agent.Tools.Samples)
+        - General/Multiple components
+        - Not sure
+
+  - type: textarea
+    id: question
+    attributes:
+      label: Your Question
+      description: What would you like to know?
+      placeholder: Please be as specific as possible about what you're trying to achieve or understand
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Context
+      description: Provide context about your project, use case, or what you're trying to build
+      placeholder: |
+        - What type of application are you building?
+        - What are you trying to achieve?
+        - What have you tried so far?
+
+  - type: textarea
+    id: code
+    attributes:
+      label: Relevant Code
+      description: If applicable, share relevant code snippets
+      render: csharp
+      placeholder: |
+        // Share any code that's relevant to your question
+        var agent = new YourAgent();
+        // What should happen here?
+
+  - type: input
+    id: version
+    attributes:
+      label: Package Version
+      description: Which version of the packages are you using?
+      placeholder: "e.g., GenericAgents.Core 1.0.0"
+
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+      description: What's your development environment?
+      placeholder: "e.g., .NET 8.0, ASP.NET Core, Windows 11"
+
+  - type: textarea
+    id: attempts
+    attributes:
+      label: What You've Tried
+      description: What approaches have you already attempted?
+      placeholder: |
+        - Checked the documentation at...
+        - Tried this approach...
+        - Searched for similar issues...
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional Information
+      description: Any other information that might be helpful
+      placeholder: Links to documentation, external resources, or anything else that provides context
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Checklist
+      description: Please confirm the following
+      options:
+        - label: I have searched the documentation for an answer
+        - label: I have searched existing issues and discussions
+        - label: I have provided sufficient context about my use case
+          required: true
