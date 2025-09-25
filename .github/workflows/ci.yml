@@ -210,7 +210,7 @@ jobs:
     name: Package Validation
     runs-on: ubuntu-latest
     needs: [test, lint-and-format]
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.pull_request.base.ref == 'main')
     
     steps:
     - name: Checkout code
@@ -240,9 +240,9 @@ jobs:
     - name: Upload packages
       uses: actions/upload-artifact@v4
       with:
-        name: nuget-packages
+        name: nuget-packages-${{ github.event_name }}-${{ github.run_number }}
         path: ./packages/*.nupkg
-        retention-days: 30
+        retention-days: ${{ github.event_name == 'push' && 30 || 5 }}
 
   # This job name will be used in GitHub branch protection rules
   all-checks:
