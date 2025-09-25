@@ -64,41 +64,80 @@ dotnet add package GenericAgents.Tools.Samples   # Example tools
 
 ```csharp
 // Program.cs - Add to your existing .NET application
-builder.Services.AddGenericAgents(configuration =>
-{
-    configuration.UseCore()
-                 .UseTools()
-                 .UseAI("your-openai-api-key")
-                 .UseSecurity();
-});
+using Agent.DI;
+using Agent.AI.Models;
 
-// Your existing controller enhanced with AI
+var builder = WebApplication.CreateBuilder(args);
+
+// Add your existing services
+builder.Services.AddControllers();
+
+// Add GenericAgents services (CORRECT API)
+builder.Services.AddAgentServices(builder.Configuration);
+builder.Services.AddAgentToolDiscovery();
+
+// Optional: Add security features
+builder.Services.AddEnvironmentSecretManagement();
+builder.Services.AddLocalJwtAuthentication("your-jwt-signing-key");
+
+var app = builder.Build();
+
+// Configure pipeline
+app.UseHttpsRedirection();
+app.UseAuthorization();
+app.MapControllers();
+app.Run();
+```
+
+**appsettings.json configuration:**
+```json
+{
+  "AI": {
+    "Provider": "OpenAI",
+    "ModelId": "gpt-4",
+    "ApiKey": "your-openai-api-key",
+    "MaxTokens": 2000,
+    "Temperature": 0.7
+  }
+}
+```
+
+**Your existing controller enhanced with AI:**
+```csharp
+using Agent.Core;
+using Agent.Core.Models;
+using Agent.AI;
+
 [ApiController]
 public class YourController : ControllerBase
 {
-    private readonly IAgentOrchestrator _orchestrator;
+    private readonly IAIService _aiService;
+    private readonly IToolRegistry _toolRegistry;
     
-    public YourController(IAgentOrchestrator orchestrator)
+    public YourController(IAIService aiService, IToolRegistry toolRegistry)
     {
-        _orchestrator = orchestrator;
+        _aiService = aiService;
+        _toolRegistry = toolRegistry;
     }
     
     [HttpPost("/analyze")]
     public async Task<IActionResult> AnalyzeWithAI(AnalysisRequest request)
     {
-        // Create AI workflow
-        var workflow = await _orchestrator.CreateWorkflowAsync("analysis", new
-        {
-            data = request.Data,
-            analysisType = request.Type
-        });
-        
-        var result = await workflow.ExecuteAsync();
+        // Use AI service to analyze the request
+        var aiResponse = await _aiService.ProcessRequestAsync(
+            $"Analyze this data: {request.Data}", 
+            CancellationToken.None
+        );
         
         // Combine with your existing business logic
-        var enhancedResult = await YourBusinessLogic(result);
+        var enhancedResult = await YourBusinessLogic(request, aiResponse);
         
-        return Ok(enhancedResult);
+        return Ok(new
+        {
+            OriginalData = request.Data,
+            AIInsights = aiResponse.Content,
+            EnhancedResult = enhancedResult
+        });
     }
 }
 ```
