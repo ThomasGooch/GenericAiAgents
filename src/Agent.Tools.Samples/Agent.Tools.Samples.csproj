@@ -9,6 +9,35 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <NoWarn>CS1998</NoWarn>
+    
+    <!-- NuGet Package Metadata -->
+    <PackageId>GenericAgents.Tools.Samples</PackageId>
+    <Title>Generic AI Agent System - Sample Tools</Title>
+    <Description>Sample tool implementations demonstrating file system operations, HTTP requests, and text processing for AI agent workflows.</Description>
+    <PackageTags>ai;agents;samples;tools;examples;filesystem;http;text-processing</PackageTags>
+    <Version>1.0.0</Version>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <FileVersion>1.0.0.0</FileVersion>
+    <Authors>Thomas Gooch</Authors>
+    <Company>Generic Agents</Company>
+    <Product>Generic AI Agent System</Product>
+    <PackageProjectUrl>https://github.com/thomas-gooch/generic-agents</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/thomas-gooch/generic-agents</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageIcon>icon.png</PackageIcon>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
   </PropertyGroup>
+
+  <!-- Package Files -->
+  <ItemGroup>
+    <None Include="../../README.md" Pack="true" PackagePath="\" />
+    <None Include="../../assets/icon.png" Pack="true" PackagePath="\" />
+  </ItemGroup>
 
 </Project>

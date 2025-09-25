@@ -5,6 +5,7 @@ on:
     branches: [ main, develop ]
   pull_request:
     branches: [ main, develop ]
+    types: [ opened, synchronize, reopened, ready_for_review ]
   workflow_dispatch:
 
 env:
@@ -181,7 +182,19 @@ jobs:
 
     - name: Run static analysis
       run: |
-        dotnet build --configuration Release --verbosity normal /p:TreatWarningsAsErrors=true
+        echo "Running static analysis..."
+        
+        # Build without treating documentation warnings as errors
+        # CS1591 = Missing XML comment warnings
+        dotnet build --configuration Release --verbosity normal /p:TreatWarningsAsErrors=true /p:WarningsNotAsErrors=CS1591
+        
+        # Check for actual code issues (not documentation)
+        echo "Checking for potential issues..."
+        if grep -r "TODO\|FIXME\|HACK" src/ --include="*.cs" | head -5; then
+          echo "⚠️ Found TODO/FIXME comments - consider addressing"
+        fi
+        
+        echo "✅ Static analysis completed"
 
   # Docker build removed - this is a class library framework, not a deployable application
   # If you need Docker builds in the future, create a proper web API project first
@@ -192,26 +205,80 @@ jobs:
   # Deployment disabled - this is a class library framework, not a deployable application
   # When you create a deployable application, re-enable deployment jobs
 
-  notify:
-    name: Notify Results
+  # Package validation for main branch pushes and releases
+  package-validation:
+    name: Package Validation
+    runs-on: ubuntu-latest
+    needs: [test, lint-and-format]
+    if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.pull_request.base.ref == 'main')
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+
+    - name: Create NuGet packages
+      run: dotnet pack --configuration Release --output ./packages --verbosity minimal
+
+    - name: Validate packages
+      run: |
+        echo "Validating NuGet packages..."
+        package_count=$(ls ./packages/*.nupkg | grep -v "\.snupkg$" | wc -l)
+        expected_count=11
+        
+        if [ $package_count -ne $expected_count ]; then
+          echo "❌ Expected $expected_count packages, found $package_count"
+          exit 1
+        fi
+        
+        echo "✅ All $package_count packages validated successfully"
+
+    - name: Upload packages
+      uses: actions/upload-artifact@v4
+      with:
+        name: nuget-packages-${{ github.event_name }}-${{ github.run_number }}
+        path: ./packages/*.nupkg
+        retention-days: ${{ github.event_name == 'push' && 30 || 5 }}
+
+  # This job name will be used in GitHub branch protection rules
+  all-checks:
+    name: All Checks
     runs-on: ubuntu-latest
     needs: [test, security-scan, lint-and-format]
     if: always()
     
     steps:
-    - name: Notify on success
-      if: needs.test.result == 'success' && needs.security-scan.result == 'success' && needs.lint-and-format.result == 'success'
+    - name: Check all jobs status
       run: |
-        echo "✅ All CI/CD checks passed successfully!"
-        echo "🔒 Security: ✅"
-        echo "🧪 Tests: ✅"
-        echo "📝 Code Quality: ✅"
-
-    - name: Notify on failure
-      if: needs.test.result == 'failure' || needs.security-scan.result == 'failure' || needs.lint-and-format.result == 'failure'
-      run: |
-        echo "❌ Some CI/CD checks failed!"
-        echo "🔒 Security: ${{ needs.security-scan.result }}"
+        echo "📋 CI/CD Pipeline Results"
+        echo "========================"
         echo "🧪 Tests: ${{ needs.test.result }}"
+        echo "🔒 Security: ${{ needs.security-scan.result }}"
         echo "📝 Code Quality: ${{ needs.lint-and-format.result }}"
-        exit 1
+        echo
+        
+        # For PRs, provide specific feedback
+        if [ "${{ github.event_name }}" = "pull_request" ]; then
+          echo "🔍 Pull Request #${{ github.event.pull_request.number }} Validation"
+          echo "Base: ${{ github.event.pull_request.base.ref }}"
+          echo "Head: ${{ github.event.pull_request.head.ref }}"
+        fi
+        
+        # Check if any job failed
+        if [[ "${{ needs.test.result }}" == "failure" ]] || \
+           [[ "${{ needs.security-scan.result }}" == "failure" ]] || \
+           [[ "${{ needs.lint-and-format.result }}" == "failure" ]]; then
+          echo
+          echo "❌ Some checks failed! Please fix issues before merging."
+          exit 1
+        else
+          echo
+          echo "✅ All checks passed successfully!"
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            echo "🚀 This PR is ready for review and merge!"
+          fi
+        fi

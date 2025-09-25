@@ -4,7 +4,44 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    
+    <!-- Package Identity -->
+    <PackageId>GenericAgents.Security</PackageId>
+    <Version>1.0.0</Version>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <FileVersion>1.0.0.0</FileVersion>
+    
+    <!-- Package Metadata -->
+    <Title>Generic AI Agent System - Security</Title>
+    <Authors>Thomas Gooch</Authors>
+    <Company>Generic Agents</Company>
+    <Product>Generic AI Agent System</Product>
+    <Description>Enterprise-grade security framework with JWT authentication, RBAC authorization, and Azure Key Vault integration for AI agent systems.</Description>
+    
+    <!-- Package Details -->
+    <PackageTags>ai;agents;security;jwt;rbac;azure-keyvault;authentication;authorization;enterprise</PackageTags>
+    <PackageProjectUrl>https://github.com/thomas-gooch/generic-agents</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/thomas-gooch/generic-agents</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    
+    <!-- Documentation -->
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageIcon>icon.png</PackageIcon>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    
+    <!-- Build Configuration -->
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
   </PropertyGroup>
+  
+  <!-- Package Files -->
+  <ItemGroup>
+    <None Include="../../README.md" Pack="true" PackagePath="\" />
+    <None Include="../../assets/icon.png" Pack="true" PackagePath="\" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Azure.Security.KeyVault.Secrets" Version="4.5.0" />

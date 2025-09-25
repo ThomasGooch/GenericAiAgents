@@ -14,6 +14,43 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    
+    <!-- Package Identity -->
+    <PackageId>GenericAgents.AI</PackageId>
+    <Version>1.0.0</Version>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <FileVersion>1.0.0.0</FileVersion>
+    
+    <!-- Package Metadata -->
+    <Title>Generic AI Agent System - AI Integration</Title>
+    <Authors>Thomas Gooch</Authors>
+    <Company>Generic Agents</Company>
+    <Product>Generic AI Agent System</Product>
+    <Description>AI service integration layer with Semantic Kernel support for building intelligent agent workflows. Provides abstractions and implementations for various AI providers.</Description>
+    
+    <!-- Package Details -->
+    <PackageTags>ai;agents;semantic-kernel;openai;azure;cognitive-services;llm;machine-learning</PackageTags>
+    <PackageProjectUrl>https://github.com/thomas-gooch/generic-agents</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/thomas-gooch/generic-agents</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    
+    <!-- Documentation -->
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageIcon>icon.png</PackageIcon>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    
+    <!-- Build Configuration -->
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
   </PropertyGroup>
+  
+  <!-- Package Files -->
+  <ItemGroup>
+    <None Include="../../README.md" Pack="true" PackagePath="\" />
+    <None Include="../../assets/icon.png" Pack="true" PackagePath="\" />
+  </ItemGroup>
 
 </Project>
