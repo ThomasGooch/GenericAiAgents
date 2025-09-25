@@ -24,8 +24,8 @@
     
     <!-- Package Details -->
     <PackageTags>ai;agents;tools;workflow;orchestration;dotnet;extensions;plugins</PackageTags>
-    <PackageProjectUrl>https://github.com/thomas-gooch/generic-agents</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/thomas-gooch/generic-agents</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/ThomasGooch/GenericAiAgents</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/ThomasGooch/GenericAiAgents</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>

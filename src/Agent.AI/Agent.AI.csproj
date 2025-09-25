@@ -30,8 +30,8 @@
     
     <!-- Package Details -->
     <PackageTags>ai;agents;semantic-kernel;openai;azure;cognitive-services;llm;machine-learning</PackageTags>
-    <PackageProjectUrl>https://github.com/thomas-gooch/generic-agents</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/thomas-gooch/generic-agents</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/ThomasGooch/GenericAiAgents</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/ThomasGooch/GenericAiAgents</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
