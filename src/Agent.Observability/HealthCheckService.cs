@@ -7,8 +7,277 @@ using System.Diagnostics;
 namespace Agent.Observability;
 
 /// <summary>
-/// Default implementation of health check service
+/// Enterprise-grade health monitoring service that provides comprehensive system health assessment,
+/// real-time health monitoring, and automated alerting for distributed agent systems.
+/// 
+/// This service implements a multi-layered health monitoring approach that continuously assesses the
+/// health of agents, system resources, custom components, and external dependencies. It provides
+/// real-time health status tracking, automatic failover support, and comprehensive health reporting
+/// for production environments requiring high availability and operational excellence.
+/// 
+/// Key Enterprise Features:
+/// - **Multi-Level Health Assessment**: Component-level, agent-level, and system-level health evaluation
+/// - **Real-Time Monitoring**: Continuous background health checks with configurable intervals
+/// - **Event-Driven Architecture**: Immediate notifications for health status changes and critical events
+/// - **Custom Health Check Integration**: Extensible framework for domain-specific health validations
+/// - **Performance Monitoring**: Built-in system resource monitoring (CPU, memory, disk, network)
+/// - **Timeout Management**: Configurable timeouts prevent hanging health checks from affecting system performance
+/// - **Exception Handling**: Comprehensive error handling with detailed exception reporting and recovery
+/// - **Historical Tracking**: Health status change detection and trend analysis capabilities
+/// 
+/// Health Check Categories:
+/// - **Agent Health**: Monitors registered agents for availability, performance, and operational status
+/// - **System Resources**: Tracks CPU usage, memory consumption, disk space, and system performance
+/// - **Custom Components**: Supports custom health checks for databases, external services, and business logic
+/// - **Infrastructure Health**: Monitors underlying infrastructure components and dependencies
+/// - **Network Connectivity**: Validates network connectivity and external service availability
+/// 
+/// Production Deployment Features:
+/// - **High Performance**: Asynchronous health checks minimize impact on system performance
+/// - **Scalability**: Efficient concurrent health checking supports large-scale deployments
+/// - **Reliability**: Fault-tolerant design continues operating even when individual health checks fail
+/// - **Observability**: Comprehensive metrics and logging for operational monitoring and troubleshooting
+/// - **Integration Ready**: Compatible with external monitoring systems and alerting platforms
+/// - **Resource Management**: Automatic cleanup and memory management for long-running operations
+/// 
+/// Health Status Levels:
+/// - **Healthy**: All components are functioning normally within acceptable parameters
+/// - **Warning**: Some components show degraded performance but core functionality remains operational
+/// - **Degraded**: Significant issues detected but system continues to provide essential services
+/// - **Critical**: Major failures detected requiring immediate intervention and possible failover
+/// 
+/// Alert and Notification System:
+/// - **Real-Time Events**: Immediate notifications when health status changes occur
+/// - **Configurable Thresholds**: Customizable health thresholds for different components and environments
+/// - **Event Aggregation**: Intelligent event consolidation to prevent alert storms during system issues
+/// - **Integration Support**: Compatible with external alerting systems (PagerDuty, Slack, email, SMS)
+/// - **Escalation Policies**: Support for multi-tier escalation based on severity and component criticality
 /// </summary>
+/// <example>
+/// Basic health monitoring setup with periodic checks:
+/// <code>
+/// // Initialize health service with agent registry
+/// var healthService = new HealthCheckService(agentRegistry);
+/// 
+/// // Register custom health checks
+/// healthService.RegisterHealthCheck("database", new DatabaseHealthCheck(connectionString));
+/// healthService.RegisterHealthCheck("redis", new RedisHealthCheck(redisConnection));
+/// healthService.RegisterHealthCheck("external-api", new ExternalApiHealthCheck(apiEndpoint));
+/// 
+/// // Subscribe to health change events
+/// healthService.HealthStatusChanged += (sender, args) =&gt;
+/// {
+///     Console.WriteLine($"Health status changed from {args.PreviousStatus.OverallStatus} to {args.CurrentStatus.OverallStatus}");
+///     
+///     // Trigger alerts for critical issues
+///     if (args.CurrentStatus.OverallStatus == SystemHealthLevel.Critical)
+///     {
+///         await AlertingService.SendCriticalAlert(
+///             "System Health Critical", 
+///             $"System health has degraded to critical level. Components affected: {string.Join(", ", args.ChangedComponents)}"
+///         );
+///     }
+/// };
+/// 
+/// // Start periodic health monitoring
+/// await healthService.StartPeriodicHealthChecksAsync(TimeSpan.FromMinutes(1));
+/// 
+/// // Perform immediate health check
+/// var healthStatus = await healthService.CheckSystemHealthAsync();
+/// Console.WriteLine($"System Health: {healthStatus.OverallStatus}");
+/// Console.WriteLine($"Healthy Components: {healthStatus.ComponentHealth.Count(c =&gt; c.Value.IsHealthy)}");
+/// Console.WriteLine($"Total Check Time: {healthStatus.TotalCheckTime}");
+/// </code>
+/// 
+/// Advanced health monitoring with comprehensive reporting:
+/// <code>
+/// public class ProductionHealthMonitor
+/// {
+///     private readonly HealthCheckService _healthService;
+///     private readonly ILogger&lt;ProductionHealthMonitor&gt; _logger;
+///     private readonly IMetricsCollector _metrics;
+/// 
+///     public async Task InitializeMonitoringAsync()
+///     {
+///         // Register production-specific health checks
+///         _healthService.RegisterHealthCheck("payment-gateway", new PaymentGatewayHealthCheck());
+///         _healthService.RegisterHealthCheck("user-service", new MicroserviceHealthCheck("https://api.users.company.com/health"));
+///         _healthService.RegisterHealthCheck("message-queue", new MessageQueueHealthCheck());
+///         
+///         // Subscribe to health events for monitoring
+///         _healthService.HealthStatusChanged += OnHealthStatusChanged;
+///         _healthService.HealthCheckCompleted += OnHealthCheckCompleted;
+///         
+///         // Start monitoring with production intervals
+///         await _healthService.StartPeriodicHealthChecksAsync(TimeSpan.FromSeconds(30));
+///     }
+///     
+///     private async void OnHealthStatusChanged(object? sender, HealthStatusChangedEventArgs e)
+///     {
+///         // Record health metrics
+///         _metrics.SetGaugeValue("system.health.overall_status", (int)e.CurrentStatus.OverallStatus);
+///         _metrics.SetGaugeValue("system.health.healthy_components", e.CurrentStatus.ComponentHealth.Count(c =&gt; c.Value.IsHealthy));
+///         
+///         // Log health changes
+///         _logger.LogInformation("System health changed from {PreviousStatus} to {CurrentStatus}. Changed components: {ChangedComponents}",
+///             e.PreviousStatus.OverallStatus, e.CurrentStatus.OverallStatus, string.Join(", ", e.ChangedComponents));
+///         
+///         // Generate comprehensive health report for critical issues
+///         if (e.CurrentStatus.OverallStatus == SystemHealthLevel.Critical)
+///         {
+///             var healthReport = await _healthService.GetHealthReportAsync();
+///             await SendHealthReport(healthReport);
+///         }
+///     }
+///     
+///     private void OnHealthCheckCompleted(object? sender, HealthCheckCompletedEventArgs e)
+///     {
+///         // Record per-component health metrics
+///         _metrics.SetGaugeValue($"component.health.{e.HealthCheckName}.status", e.Result.IsHealthy ? 1 : 0);
+///         _metrics.RecordValue($"component.health.{e.HealthCheckName}.response_time", e.Result.ResponseTime.TotalMilliseconds);
+///         
+///         // Log failed health checks
+///         if (!e.Result.IsHealthy)
+///         {
+///             _logger.LogWarning("Health check failed for {ComponentName}: {ErrorMessage}", 
+///                 e.HealthCheckName, e.Result.Message);
+///         }
+///     }
+/// }
+/// </code>
+/// 
+/// Custom health check implementation:
+/// <code>
+/// public class DatabaseHealthCheck : IHealthCheck
+/// {
+///     private readonly string _connectionString;
+///     public TimeSpan Timeout =&gt; TimeSpan.FromSeconds(10);
+/// 
+///     public DatabaseHealthCheck(string connectionString)
+///     {
+///         _connectionString = connectionString;
+///     }
+/// 
+///     public async Task&lt;HealthCheckResult&gt; CheckHealthAsync(CancellationToken cancellationToken)
+///     {
+///         var stopwatch = Stopwatch.StartNew();
+///         
+///         try
+///         {
+///             using var connection = new SqlConnection(_connectionString);
+///             await connection.OpenAsync(cancellationToken);
+///             
+///             // Test basic connectivity and performance
+///             using var command = new SqlCommand("SELECT 1", connection);
+///             var result = await command.ExecuteScalarAsync(cancellationToken);
+///             
+///             return new HealthCheckResult
+///             {
+///                 IsHealthy = true,
+///                 Message = "Database connection successful",
+///                 ResponseTime = stopwatch.Elapsed,
+///                 Data = new Dictionary&lt;string, object&gt;
+///                 {
+///                     ["server_version"] = connection.ServerVersion,
+///                     ["database"] = connection.Database,
+///                     ["connection_timeout"] = connection.ConnectionTimeout
+///                 }
+///             };
+///         }
+///         catch (Exception ex)
+///         {
+///             return new HealthCheckResult
+///             {
+///                 IsHealthy = false,
+///                 Message = $"Database connection failed: {ex.Message}",
+///                 ResponseTime = stopwatch.Elapsed,
+///                 Exception = ex
+///             };
+///         }
+///     }
+/// }
+/// </code>
+/// 
+/// Health monitoring dashboard integration:
+/// <code>
+/// public class HealthDashboardController : ControllerBase
+/// {
+///     private readonly HealthCheckService _healthService;
+/// 
+///     [HttpGet("api/health")]
+///     public async Task&lt;IActionResult&gt; GetSystemHealth()
+///     {
+///         var healthStatus = await _healthService.CheckSystemHealthAsync(TimeSpan.FromSeconds(30));
+///         
+///         return Ok(new
+///         {
+///             status = healthStatus.OverallStatus.ToString(),
+///             healthy = healthStatus.IsHealthy,
+///             timestamp = healthStatus.Timestamp,
+///             checkDuration = healthStatus.TotalCheckTime,
+///             components = healthStatus.ComponentHealth.Select(c =&gt; new
+///             {
+///                 name = c.Key,
+///                 healthy = c.Value.IsHealthy,
+///                 message = c.Value.Message,
+///                 responseTime = c.Value.ResponseTime
+///             })
+///         });
+///     }
+/// 
+///     [HttpGet("api/health/report")]
+///     public async Task&lt;IActionResult&gt; GetHealthReport()
+///     {
+///         var report = await _healthService.GetHealthReportAsync();
+///         return Ok(report);
+///     }
+/// 
+///     [HttpGet("api/health/{component}")]
+///     public async Task&lt;IActionResult&gt; GetComponentHealth(string component)
+///     {
+///         var componentHealth = await _healthService.CheckComponentHealthAsync(component);
+///         
+///         if (!componentHealth.IsHealthy)
+///         {
+///             return StatusCode(503, componentHealth); // Service Unavailable
+///         }
+///         
+///         return Ok(componentHealth);
+///     }
+/// }
+/// </code>
+/// </example>
+/// <remarks>
+/// Performance Considerations:
+/// - Health checks run asynchronously to avoid blocking application threads
+/// - Individual health check timeouts prevent system-wide performance degradation
+/// - Concurrent health checking maximizes efficiency while respecting system resources
+/// - Memory usage is optimized through efficient data structures and automatic cleanup
+/// 
+/// Reliability and Fault Tolerance:
+/// - Individual health check failures don't affect other health checks or system operation
+/// - Comprehensive exception handling ensures service continues operating during partial failures
+/// - Circuit breaker patterns prevent cascade failures during widespread system issues
+/// - Graceful degradation maintains essential monitoring even when extended health checks fail
+/// 
+/// Integration and Extensibility:
+/// - Custom health checks can be registered for domain-specific monitoring requirements
+/// - Event-driven architecture enables integration with external monitoring and alerting systems
+/// - Health check results include detailed metadata for advanced monitoring and analysis
+/// - Support for multiple health check providers and pluggable health assessment algorithms
+/// 
+/// Security and Compliance:
+/// - Health check execution includes appropriate error handling to prevent information leakage
+/// - Configurable timeout values prevent denial-of-service scenarios from health checks
+/// - Audit logging of health status changes supports compliance and security monitoring
+/// - Health check registration includes validation to prevent unauthorized health check injection
+/// 
+/// Operational Excellence:
+/// - Comprehensive health reporting enables proactive system management and capacity planning
+/// - Historical health data tracking supports trend analysis and predictive maintenance
+/// - Integration with metrics collection enables correlation with system performance data
+/// - Support for multiple deployment environments with environment-specific health thresholds
+/// </remarks>
 public class HealthCheckService : IHealthCheckService, IDisposable
 {
     private readonly IAgentRegistryEnhanced _agentRegistry;

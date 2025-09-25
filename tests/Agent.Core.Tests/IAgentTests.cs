@@ -38,13 +38,13 @@ public class IAgentTests
         // Test that AgentRequest model exists and has required properties
         var request = new AgentRequest
         {
-            Id = Guid.NewGuid(),
+            Id = Guid.NewGuid().ToString(),
             Input = "test input",
             Context = new Dictionary<string, object> { { "key", "value" } },
             Metadata = new Dictionary<string, object> { { "meta", "data" } }
         };
 
-        Assert.NotEqual(Guid.Empty, request.Id);
+        Assert.NotEqual(Guid.Empty.ToString(), request.Id);
         Assert.Equal("test input", request.Input);
         Assert.Single(request.Context);
         Assert.Single(request.Metadata);

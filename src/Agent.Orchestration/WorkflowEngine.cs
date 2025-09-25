@@ -7,8 +7,267 @@ using System.Diagnostics;
 namespace Agent.Orchestration;
 
 /// <summary>
-/// Workflow execution engine for orchestrating multi-agent processes
+/// Production-ready workflow execution engine that orchestrates complex multi-agent processes with enterprise-grade
+/// features including parallel execution, dependency management, fault tolerance, and real-time monitoring.
+/// 
+/// This implementation provides a comprehensive workflow orchestration platform capable of managing sophisticated
+/// multi-step processes across distributed agent systems. The engine supports multiple execution modes, advanced
+/// error handling, timeout management, and detailed execution tracking for enterprise production environments.
+/// 
+/// Key Enterprise Features:
+/// - **Multi-Modal Execution**: Sequential, parallel, and dependency-based workflow execution patterns
+/// - **Fault Tolerance**: Graceful error handling with configurable continuation policies for resilient operations
+/// - **Real-Time Monitoring**: Live execution status tracking with progress reporting and performance metrics
+/// - **Scalable Architecture**: Thread-safe concurrent execution supporting high-throughput workflow processing
+/// - **Timeout Management**: Granular timeout controls at workflow and step levels for SLA compliance
+/// - **Cancellation Support**: Cooperative cancellation with immediate response for operational control
+/// - **Agent Registry Integration**: Dynamic agent discovery and lifecycle management
+/// - **Validation Framework**: Comprehensive pre-execution validation with detailed error reporting
+/// 
+/// Execution Modes:
+/// - **Sequential**: Steps execute in defined order, suitable for linear processes and data pipelines
+/// - **Parallel**: All steps execute simultaneously, optimal for independent operations and fan-out patterns
+/// - **Dependency**: Steps execute based on dependency graphs, enabling complex workflow topologies
+/// 
+/// Production Deployment Considerations:
+/// - Engine maintains in-memory state for active workflows - consider clustering for high availability
+/// - Thread-safe design supports concurrent workflow execution across multiple threads
+/// - Comprehensive logging and monitoring integration for operational visibility
+/// - Configurable timeout and retry policies align with enterprise SLA requirements
+/// - Memory management includes automatic cleanup of completed workflow state
+/// 
+/// Performance Characteristics:
+/// - Concurrent execution of independent workflow steps for optimal throughput
+/// - Lock-free data structures for high-performance agent and status management
+/// - Efficient dependency resolution algorithms preventing circular dependency deadlocks
+/// - Minimal memory footprint with automatic cleanup of completed workflows
 /// </summary>
+/// <example>
+/// Basic workflow execution with sequential processing:
+/// <code>
+/// var engine = new WorkflowEngine();
+/// 
+/// // Register agents for workflow execution
+/// await engine.RegisterAgentAsync(new DataProcessingAgent(), cancellationToken);
+/// await engine.RegisterAgentAsync(new ValidationAgent(), cancellationToken);
+/// 
+/// // Define a sequential workflow for data processing pipeline
+/// var workflow = new WorkflowDefinition
+/// {
+///     Id = Guid.NewGuid(),
+///     Name = "Data Processing Pipeline",
+///     ExecutionMode = WorkflowExecutionMode.Sequential,
+///     Steps = new List&lt;WorkflowStep&gt;
+///     {
+///         new()
+///         {
+///             Id = Guid.NewGuid(),
+///             Name = "Extract Data",
+///             AgentId = "data-processor",
+///             Order = 1,
+///             Input = new { Source = "database", Table = "customers" },
+///             Timeout = TimeSpan.FromMinutes(10)
+///         },
+///         new()
+///         {
+///             Id = Guid.NewGuid(),
+///             Name = "Validate Data",
+///             AgentId = "validator",
+///             Order = 2,
+///             Input = new { Rules = "standard-validation" },
+///             ContinueOnFailure = false
+///         }
+///     }
+/// };
+/// 
+/// // Execute workflow with monitoring
+/// var result = await engine.ExecuteWorkflowAsync(workflow, cancellationToken);
+/// 
+/// if (result.Success)
+/// {
+///     Console.WriteLine($"Workflow completed in {result.ExecutionTime}");
+///     foreach (var step in result.StepResults)
+///     {
+///         Console.WriteLine($"Step {step.StepName}: {(step.Success ? "SUCCESS" : "FAILED")}");
+///     }
+/// }
+/// </code>
+/// 
+/// Advanced parallel workflow with error handling:
+/// <code>
+/// // Define parallel workflow for concurrent data processing
+/// var parallelWorkflow = new WorkflowDefinition
+/// {
+///     Id = Guid.NewGuid(),
+///     Name = "Parallel Data Analysis",
+///     ExecutionMode = WorkflowExecutionMode.Parallel,
+///     Steps = new List&lt;WorkflowStep&gt;
+///     {
+///         new()
+///         {
+///             Id = Guid.NewGuid(),
+///             Name = "Analyze Sales Data",
+///             AgentId = "sales-analyzer",
+///             Input = new { DateRange = "2024-Q1" },
+///             ContinueOnFailure = true,  // Continue even if this analysis fails
+///             Timeout = TimeSpan.FromMinutes(15)
+///         },
+///         new()
+///         {
+///             Id = Guid.NewGuid(),
+///             Name = "Analyze Customer Data", 
+///             AgentId = "customer-analyzer",
+///             Input = new { Segment = "premium" },
+///             ContinueOnFailure = true
+///         },
+///         new()
+///         {
+///             Id = Guid.NewGuid(),
+///             Name = "Generate Report",
+///             AgentId = "report-generator",
+///             Input = new { Format = "executive-summary" },
+///             ContinueOnFailure = false  // Critical step - must succeed
+///         }
+///     }
+/// };
+/// 
+/// // Execute with real-time monitoring
+/// var executeTask = engine.ExecuteWorkflowAsync(parallelWorkflow, cancellationToken);
+/// 
+/// // Monitor progress in real-time
+/// while (!executeTask.IsCompleted)
+/// {
+///     var status = await engine.GetExecutionStatusAsync(parallelWorkflow.Id);
+///     if (status != null)
+///     {
+///         Console.WriteLine($"Progress: {status.ProgressPercentage:F1}% - {status.State}");
+///         Console.WriteLine($"Completed: {status.CompletedSteps.Count}, Failed: {status.FailedSteps.Count}");
+///     }
+///     
+///     await Task.Delay(1000, cancellationToken);
+/// }
+/// 
+/// var result = await executeTask;
+/// </code>
+/// 
+/// Complex dependency-based workflow for microservices orchestration:
+/// <code>
+/// var dependencyWorkflow = new WorkflowDefinition
+/// {
+///     Id = Guid.NewGuid(),
+///     Name = "Microservices Integration Flow",
+///     ExecutionMode = WorkflowExecutionMode.Dependency,
+///     Steps = new List&lt;WorkflowStep&gt;
+///     {
+///         new()
+///         {
+///             Id = Guid.Parse("11111111-1111-1111-1111-111111111111"),
+///             Name = "Initialize User Context",
+///             AgentId = "user-service",
+///             Dependencies = new List&lt;Guid&gt;(), // No dependencies - runs first
+///             Input = new { UserId = "12345" }
+///         },
+///         new()
+///         {
+///             Id = Guid.Parse("22222222-2222-2222-2222-222222222222"),
+///             Name = "Load User Preferences",
+///             AgentId = "preference-service",
+///             Dependencies = new List&lt;Guid&gt; 
+///             { 
+///                 Guid.Parse("11111111-1111-1111-1111-111111111111") 
+///             },
+///             Input = new { IncludeHistory = true }
+///         },
+///         new()
+///         {
+///             Id = Guid.Parse("33333333-3333-3333-3333-333333333333"),
+///             Name = "Calculate Recommendations",
+///             AgentId = "recommendation-engine",
+///             Dependencies = new List&lt;Guid&gt; 
+///             { 
+///                 Guid.Parse("11111111-1111-1111-1111-111111111111"),
+///                 Guid.Parse("22222222-2222-2222-2222-222222222222")
+///             },
+///             Input = new { Algorithm = "collaborative-filtering" }
+///         }
+///     }
+/// };
+/// 
+/// // Validate workflow before execution
+/// var validation = await engine.ValidateWorkflowAsync(dependencyWorkflow);
+/// if (!validation.IsValid)
+/// {
+///     foreach (var error in validation.Errors)
+///     {
+///         Console.WriteLine($"Validation Error: {error}");
+///     }
+///     return;
+/// }
+/// 
+/// var result = await engine.ExecuteWorkflowAsync(dependencyWorkflow, cancellationToken);
+/// </code>
+/// 
+/// Enterprise workflow cancellation and cleanup:
+/// <code>
+/// // Start long-running workflow
+/// var longRunningWorkflow = CreateLongRunningWorkflow();
+/// var executionTask = engine.ExecuteWorkflowAsync(longRunningWorkflow, cancellationToken);
+/// 
+/// // Cancel workflow if needed (e.g., user request, system shutdown)
+/// var cancellationSuccessful = await engine.CancelWorkflowAsync(longRunningWorkflow.Id);
+/// 
+/// if (cancellationSuccessful)
+/// {
+///     Console.WriteLine("Workflow cancellation initiated");
+///     
+///     // Wait for graceful shutdown
+///     try 
+///     {
+///         await executionTask;
+///     }
+///     catch (OperationCanceledException)
+///     {
+///         Console.WriteLine("Workflow cancelled successfully");
+///     }
+/// }
+/// </code>
+/// </example>
+/// <remarks>
+/// Thread Safety and Concurrency:
+/// - All public methods are thread-safe and support concurrent access
+/// - Internal state uses concurrent collections for safe multi-threaded operation
+/// - Workflow execution is isolated - multiple workflows can run simultaneously
+/// - Agent registration and retrieval operations are atomic and consistent
+/// 
+/// Memory Management:
+/// - Completed workflows are automatically cleaned up to prevent memory leaks
+/// - Large workflow outputs should be persisted externally to minimize memory usage
+/// - Consider implementing workflow state persistence for long-running processes
+/// 
+/// Error Handling and Resilience:
+/// - Individual step failures don't necessarily cause workflow failure
+/// - Configurable error handling policies at both workflow and step levels
+/// - Comprehensive error reporting with detailed failure context
+/// - Timeout handling prevents indefinite blocking of workflow execution
+/// 
+/// Monitoring and Observability:
+/// - Real-time execution status tracking with progress reporting
+/// - Detailed timing information for performance analysis
+/// - Integration points for external monitoring systems
+/// - Structured logging support for enterprise monitoring platforms
+/// 
+/// Performance Optimization:
+/// - Dependency resolution algorithms optimized for complex workflow graphs
+/// - Parallel execution maximizes throughput for independent operations
+/// - Memory-efficient data structures minimize overhead for large workflows
+/// - Lock-free operations where possible to maximize concurrent throughput
+/// 
+/// Production Deployment:
+/// - Consider implementing workflow state persistence for disaster recovery
+/// - Monitor memory usage for workflows with large intermediate results
+/// - Implement circuit breaker patterns for external agent dependencies
+/// - Use structured logging for integration with enterprise monitoring systems
+/// </remarks>
 public class WorkflowEngine : IWorkflowEngine
 {
     private readonly ConcurrentDictionary<string, IAgent> _agents = new();
@@ -259,7 +518,7 @@ public class WorkflowEngine : IWorkflowEngine
             var agentRequest = new AgentRequest
             {
                 Input = step.Input,
-                Id = Guid.NewGuid(),
+                Id = Guid.NewGuid().ToString(),
                 Metadata = step.Configuration,
                 CancellationToken = effectiveToken
             };
