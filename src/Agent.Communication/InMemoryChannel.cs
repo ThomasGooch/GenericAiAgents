@@ -201,18 +201,18 @@ public class InMemoryChannel : BaseChannel
     {
         if (string.IsNullOrEmpty(request.Target))
         {
-            return CommunicationResponse.CreateError(request.RequestId, "Target channel not specified", ChannelId, request.Target);
+            return CommunicationResponse.CreateError(request.Id, "Target channel not specified", ChannelId, request.Target);
         }
 
         // Find target channel
         if (!_channelRegistry.TryGetValue(request.Target, out var targetChannel))
         {
-            return CommunicationResponse.CreateError(request.RequestId, $"Target channel '{request.Target}' not found", ChannelId, request.Target);
+            return CommunicationResponse.CreateError(request.Id, $"Target channel '{request.Target}' not found", ChannelId, request.Target);
         }
 
         if (!targetChannel._isListening || targetChannel._requestHandler == null)
         {
-            return CommunicationResponse.CreateError(request.RequestId, $"Target channel '{request.Target}' is not listening", ChannelId, request.Target);
+            return CommunicationResponse.CreateError(request.Id, $"Target channel '{request.Target}' is not listening", ChannelId, request.Target);
         }
 
         try
@@ -225,7 +225,7 @@ public class InMemoryChannel : BaseChannel
         }
         catch (Exception ex)
         {
-            return CommunicationResponse.CreateError(request.RequestId, $"Request processing failed: {ex.Message}", request.Target, ChannelId);
+            return CommunicationResponse.CreateError(request.Id, $"Request processing failed: {ex.Message}", request.Target, ChannelId);
         }
     }
 

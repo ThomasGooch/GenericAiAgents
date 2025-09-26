@@ -373,7 +373,7 @@ public abstract class BaseTool : ITool
     /// Type compatibility is determined through multiple mechanisms:
     /// <list type="bullet">
     /// <item><description><strong>Direct Assignment</strong>: Value type is assignable to expected type</description></item>
-    /// <item><description><strong>Type Conversion</strong>: Value can be converted using <see cref="Convert.ChangeType"/></description></item>
+    /// <item><description><strong>Type Conversion</strong>: Value can be converted using <see cref="Convert.ChangeType(object?, Type)"/></description></item>
     /// <item><description><strong>Inheritance</strong>: Value type inherits from or implements expected type</description></item>
     /// </list>
     /// 
@@ -823,7 +823,7 @@ public abstract class BaseTool : ITool
     /// <para><strong>Compatibility Rules:</strong></para>
     /// <list type="number">
     /// <item><description><strong>Direct Assignment</strong>: Value type is directly assignable to expected type</description></item>
-    /// <item><description><strong>Type Conversion</strong>: Value can be converted using <see cref="Convert.ChangeType"/></description></item>
+    /// <item><description><strong>Type Conversion</strong>: Value can be converted using <see cref="Convert.ChangeType(object?, Type)"/></description></item>
     /// <item><description><strong>Inheritance/Interface</strong>: Value type inherits from or implements expected type</description></item>
     /// </list>
     /// 

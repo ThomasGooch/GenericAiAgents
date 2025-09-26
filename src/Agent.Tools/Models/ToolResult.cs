@@ -284,13 +284,13 @@ public class ToolResult
     /// <code>
     /// // Accessing different data types safely
     /// var textResult = await textProcessor.ExecuteAsync(parameters);
-    /// if (textResult.IsSuccess && textResult.Data is string processedText)
+    /// if (textResult.IsSuccess &amp;&amp; textResult.Data is string processedText)
     /// {
     ///     Console.WriteLine($"Processed text: {processedText}");
     /// }
     /// 
     /// var queryResult = await databaseTool.ExecuteAsync(parameters);
-    /// if (queryResult.IsSuccess && queryResult.Data is List&lt;Dictionary&lt;string, object&gt;&gt; rows)
+    /// if (queryResult.IsSuccess &amp;&amp; queryResult.Data is List&lt;Dictionary&lt;string, object&gt;&gt; rows)
     /// {
     ///     Console.WriteLine($"Retrieved {rows.Count} rows");
     ///     foreach (var row in rows)
@@ -379,7 +379,7 @@ public class ToolResult
     /// }
     /// 
     /// // Business logic error
-    /// if (account.Balance < transferAmount)
+    /// if (account.Balance &lt; transferAmount)
     /// {
     ///     return ToolResult.CreateError($"Insufficient funds. Account balance ({account.Balance:C}) is less than transfer amount ({transferAmount:C}).");
     /// }
@@ -589,7 +589,7 @@ public class ToolResult
     /// 
     /// // For better formatting of complex objects, consider JSON serialization
     /// var complexResult = await analysisTool.ExecuteAsync(parameters);
-    /// if (complexResult.IsSuccess && complexResult.Data != null)
+    /// if (complexResult.IsSuccess &amp;&amp; complexResult.Data != null)
     /// {
     ///     var formattedOutput = JsonSerializer.Serialize(complexResult.Data, new JsonSerializerOptions 
     ///     { 

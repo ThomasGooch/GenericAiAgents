@@ -209,7 +209,7 @@ public abstract class BaseChannel : ICommunicationChannel
         catch (Exception ex)
         {
             OnErrorOccurred($"Send request failed: {ex.Message}");
-            return CommunicationResponse.CreateError(request.RequestId, ex.Message, ChannelId, request.Target);
+            return CommunicationResponse.CreateError(request.Id, ex.Message, ChannelId, request.Target);
         }
     }
 
