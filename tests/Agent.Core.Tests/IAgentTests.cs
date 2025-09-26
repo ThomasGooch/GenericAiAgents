@@ -38,14 +38,14 @@ public class IAgentTests
         // Test that AgentRequest model exists and has required properties
         var request = new AgentRequest
         {
-            Id = Guid.NewGuid().ToString(),
-            Input = "test input",
+            RequestId = Guid.NewGuid().ToString(),
+            Payload = "test input",
             Context = new Dictionary<string, object> { { "key", "value" } },
             Metadata = new Dictionary<string, object> { { "meta", "data" } }
         };
 
-        Assert.NotEqual(Guid.Empty.ToString(), request.Id);
-        Assert.Equal("test input", request.Input);
+        Assert.NotEqual(Guid.Empty.ToString(), request.RequestId);
+        Assert.Equal("test input", request.Payload);
         Assert.Single(request.Context);
         Assert.Single(request.Metadata);
     }
@@ -56,15 +56,15 @@ public class IAgentTests
         // Test that AgentResult model exists and has required properties
         var result = new AgentResult
         {
-            Success = true,
-            Output = "test output",
-            Error = null,
+            IsSuccess = true,
+            Data = "test output",
+            ErrorMessage = null,
             Metadata = new Dictionary<string, object> { { "result", "metadata" } }
         };
 
-        Assert.True(result.Success);
-        Assert.Equal("test output", result.Output);
-        Assert.Null(result.Error);
+        Assert.True(result.IsSuccess);
+        Assert.Equal("test output", result.Data);
+        Assert.Null(result.ErrorMessage);
         Assert.Single(result.Metadata);
     }
 
@@ -74,9 +74,9 @@ public class IAgentTests
         var output = "success output";
         var result = AgentResult.CreateSuccess(output);
 
-        Assert.True(result.Success);
-        Assert.Equal(output, result.Output);
-        Assert.Null(result.Error);
+        Assert.True(result.IsSuccess);
+        Assert.Equal(output, result.Data);
+        Assert.Null(result.ErrorMessage);
         Assert.NotNull(result.Metadata);
     }
 
@@ -86,9 +86,9 @@ public class IAgentTests
         var error = "error message";
         var result = AgentResult.CreateError(error);
 
-        Assert.False(result.Success);
-        Assert.Null(result.Output);
-        Assert.Equal(error, result.Error);
+        Assert.False(result.IsSuccess);
+        Assert.Null(result.Data);
+        Assert.Equal(error, result.ErrorMessage);
         Assert.NotNull(result.Metadata);
     }
 }

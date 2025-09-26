@@ -189,9 +189,9 @@ namespace Agent.Tools;
 ///             ["timeout_seconds"] = 60
 ///         });
 /// 
-///         if (!httpResult.Success)
+///         if (!httpResult.IsSuccess)
 ///         {
-///             return AgentResult.CreateError($"Failed to fetch data: {httpResult.Error}");
+///             return AgentResult.CreateError($"Failed to fetch data: {httpResult.ErrorMessage}");
 ///         }
 /// 
 ///         // Get text processing tool to clean data

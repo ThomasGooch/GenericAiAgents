@@ -336,8 +336,8 @@ public interface IToolRegistry
     /// // Register tools discovered through reflection
     /// var toolTypes = Assembly.GetExecutingAssembly()
     ///     .GetTypes()
-    ///     .Where(t => typeof(ITool).IsAssignableFrom(t) && 
-    ///                 !t.IsAbstract && 
+    ///     .Where(t =&amp;gt; typeof(ITool).IsAssignableFrom(t) &amp;&amp; 
+    ///                 !t.IsAbstract &amp;&amp; 
     ///                 t.GetCustomAttribute&lt;ToolAttribute&gt;() != null);
     /// 
     /// foreach (var toolType in toolTypes)

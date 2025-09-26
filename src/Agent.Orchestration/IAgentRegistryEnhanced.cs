@@ -226,7 +226,7 @@ namespace Agent.Orchestration;
 ///         foreach (var agent in candidateAgents)
 ///         {
 ///             var health = await _registry.CheckHealthAsync(agent.Id, cancellationToken);
-///             if (health != null && health.ResponseTime &lt; bestResponseTime)
+///             if (health != null &amp;&amp; health.ResponseTime &amp;lt; bestResponseTime)
 ///             {
 ///                 bestAgent = agent;
 ///                 bestResponseTime = health.ResponseTime;

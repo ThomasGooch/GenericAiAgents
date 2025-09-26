@@ -83,12 +83,12 @@ namespace Agent.Orchestration;
 /// // Execute workflow with monitoring
 /// var result = await engine.ExecuteWorkflowAsync(workflow, cancellationToken);
 /// 
-/// if (result.Success)
+/// if (result.IsSuccess)
 /// {
 ///     Console.WriteLine($"Workflow completed in {result.ExecutionTime}");
 ///     foreach (var step in result.StepResults)
 ///     {
-///         Console.WriteLine($"Step {step.StepName}: {(step.Success ? "SUCCESS" : "FAILED")}");
+///         Console.WriteLine($"Step {step.StepName}: {(step.IsSuccess ? "SUCCESS" : "FAILED")}");
 ///     }
 /// }
 /// </code>
@@ -304,8 +304,8 @@ public class WorkflowEngine : IWorkflowEngine
             var validationResult = await ValidateWorkflowAsync(workflow, cancellationToken);
             if (!validationResult.IsValid)
             {
-                workflowResult.Success = false;
-                workflowResult.Error = string.Join("; ", validationResult.Errors);
+                workflowResult.IsSuccess = false;
+                workflowResult.ErrorMessage = string.Join("; ", validationResult.Errors);
                 status.State = WorkflowState.Failed;
                 return workflowResult;
             }
@@ -326,38 +326,38 @@ public class WorkflowEngine : IWorkflowEngine
                     break;
 
                 default:
-                    workflowResult.Success = false;
-                    workflowResult.Error = $"Unsupported execution mode: {workflow.ExecutionMode}";
+                    workflowResult.IsSuccess = false;
+                    workflowResult.ErrorMessage = $"Unsupported execution mode: {workflow.ExecutionMode}";
                     status.State = WorkflowState.Failed;
                     return workflowResult;
             }
 
             // Determine workflow success: all steps must succeed OR failed steps have ContinueOnFailure = true
-            var failedSteps = workflowResult.StepResults.Where(r => !r.Success).ToList();
+            var failedSteps = workflowResult.StepResults.Where(r => !r.IsSuccess).ToList();
             var criticalFailures = failedSteps.Where(fs =>
             {
                 var step = workflow.Steps.FirstOrDefault(s => s.Id == fs.StepId);
                 return step == null || !step.ContinueOnFailure;
             }).ToList();
 
-            workflowResult.Success = !criticalFailures.Any();
-            status.State = workflowResult.Success ? WorkflowState.Completed : WorkflowState.Failed;
+            workflowResult.IsSuccess = !criticalFailures.Any();
+            status.State = workflowResult.IsSuccess ? WorkflowState.Completed : WorkflowState.Failed;
 
-            if (!workflowResult.Success)
+            if (!workflowResult.IsSuccess)
             {
-                workflowResult.Error = string.Join("; ", criticalFailures.Select(s => $"Step '{s.StepName}': {s.Error}"));
+                workflowResult.ErrorMessage = string.Join("; ", criticalFailures.Select(s => $"Step '{s.StepName}': {s.ErrorMessage}"));
             }
         }
         catch (OperationCanceledException)
         {
-            workflowResult.Success = false;
-            workflowResult.Error = "Workflow execution was cancelled";
+            workflowResult.IsSuccess = false;
+            workflowResult.ErrorMessage = "Workflow execution was cancelled";
             status.State = WorkflowState.Cancelled;
         }
         catch (Exception ex)
         {
-            workflowResult.Success = false;
-            workflowResult.Error = $"Workflow execution failed: {ex.Message}";
+            workflowResult.IsSuccess = false;
+            workflowResult.ErrorMessage = $"Workflow execution failed: {ex.Message}";
             status.State = WorkflowState.Failed;
         }
         finally
@@ -387,7 +387,7 @@ public class WorkflowEngine : IWorkflowEngine
             // Update execution status
             if (_executionStatus.TryGetValue(workflow.Id, out var status))
             {
-                if (stepResult.Success)
+                if (stepResult.IsSuccess)
                 {
                     status.CompletedSteps.Add(step.Id);
                 }
@@ -400,7 +400,7 @@ public class WorkflowEngine : IWorkflowEngine
             }
 
             // Stop on failure unless configured to continue
-            if (!stepResult.Success && !step.ContinueOnFailure)
+            if (!stepResult.IsSuccess && !step.ContinueOnFailure)
             {
                 break;
             }
@@ -419,7 +419,7 @@ public class WorkflowEngine : IWorkflowEngine
         {
             foreach (var result in stepResults)
             {
-                if (result.Success)
+                if (result.IsSuccess)
                 {
                     status.CompletedSteps.Add(result.StepId);
                 }
@@ -456,7 +456,7 @@ public class WorkflowEngine : IWorkflowEngine
 
             foreach (var result in stepResults)
             {
-                if (result.Success)
+                if (result.IsSuccess)
                 {
                     completedSteps.Add(result.StepId);
                 }
@@ -465,7 +465,7 @@ public class WorkflowEngine : IWorkflowEngine
                 remainingSteps.Remove(step);
 
                 // Stop on failure unless configured to continue
-                if (!result.Success && !step.ContinueOnFailure)
+                if (!result.IsSuccess && !step.ContinueOnFailure)
                 {
                     return;
                 }
@@ -498,8 +498,8 @@ public class WorkflowEngine : IWorkflowEngine
         {
             if (!_agents.TryGetValue(step.AgentId, out var agent))
             {
-                result.Success = false;
-                result.Error = $"Agent '{step.AgentId}' not found";
+                result.IsSuccess = false;
+                result.ErrorMessage = $"Agent '{step.AgentId}' not found";
                 return result;
             }
 
@@ -517,27 +517,27 @@ public class WorkflowEngine : IWorkflowEngine
 
             var agentRequest = new AgentRequest
             {
-                Input = step.Input,
-                Id = Guid.NewGuid().ToString(),
+                Payload = step.Input,
+                RequestId = Guid.NewGuid().ToString(),
                 Metadata = step.Configuration,
-                CancellationToken = effectiveToken
+                // CancellationToken passed directly to ProcessAsync method
             };
 
             var agentResult = await agent.ProcessAsync(agentRequest, effectiveToken);
 
-            result.Success = agentResult.Success;
-            result.Output = agentResult.Output?.ToString();
-            result.Error = agentResult.Error;
+            result.IsSuccess = agentResult.IsSuccess;
+            result.Data = agentResult.Data?.ToString();
+            result.ErrorMessage = agentResult.ErrorMessage;
         }
         catch (OperationCanceledException)
         {
-            result.Success = false;
-            result.Error = "Step execution was cancelled or timed out";
+            result.IsSuccess = false;
+            result.ErrorMessage = "Step execution was cancelled or timed out";
         }
         catch (Exception ex)
         {
-            result.Success = false;
-            result.Error = $"Step execution failed: {ex.Message}";
+            result.IsSuccess = false;
+            result.ErrorMessage = $"Step execution failed: {ex.Message}";
         }
         finally
         {

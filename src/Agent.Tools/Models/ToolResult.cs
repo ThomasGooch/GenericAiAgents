@@ -89,13 +89,13 @@ namespace Agent.Tools.Models;
 ///     var step1 = await _textProcessor.ExecuteAsync(new() { ["input"] = input });
 ///     if (!step1.IsSuccess)
 ///     {
-///         return ToolResult.CreateError($"Step 1 failed: {step1.Error}");
+///         return ToolResult.CreateError($"Step 1 failed: {step1.ErrorMessage}");
 ///     }
 ///     
 ///     var step2 = await _validator.ExecuteAsync(new() { ["data"] = step1.Data });
 ///     if (!step2.IsSuccess)
 ///     {
-///         return ToolResult.CreateError($"Step 2 failed: {step2.Error}");
+///         return ToolResult.CreateError($"Step 2 failed: {step2.ErrorMessage}");
 ///     }
 ///     
 ///     var step3 = await _formatter.ExecuteAsync(new() { ["validated"] = step2.Data });
@@ -183,7 +183,7 @@ public class ToolResult
     /// This property provides explicit success/failure semantics that eliminate ambiguity
     /// about operation outcomes. When <c>true</c>, the operation completed successfully
     /// and the <see cref="Data"/> property contains the result. When <c>false</c>, the
-    /// operation failed and the <see cref="Error"/> property contains error details.
+    /// operation failed and the <see cref="ErrorMessage"/> property contains error details.
     /// </summary>
     /// <value>
     /// <c>true</c> if the tool execution succeeded; otherwise, <c>false</c>.
@@ -196,7 +196,7 @@ public class ToolResult
     /// 
     /// <para><strong>Usage Guidelines:</strong></para>
     /// <list type="bullet">
-    /// <item><description>Always check this property before accessing <see cref="Data"/> or <see cref="Error"/></description></item>
+    /// <item><description>Always check this property before accessing <see cref="Data"/> or <see cref="ErrorMessage"/></description></item>
     /// <item><description>Use this for conditional logic in tool pipelines and workflows</description></item>
     /// <item><description>Consider this property in monitoring and alerting logic</description></item>
     /// </list>
@@ -210,7 +210,7 @@ public class ToolResult
     /// // Proper success checking pattern
     /// var result = await tool.ExecuteAsync(parameters);
     /// 
-    /// if (result.Success)
+    /// if (result.IsSuccess)
     /// {
     ///     // Safe to access Data property
     ///     Console.WriteLine($"Operation succeeded: {result.Data}");
@@ -218,9 +218,9 @@ public class ToolResult
     /// }
     /// else
     /// {
-    ///     // Safe to access Error property
-    ///     Console.WriteLine($"Operation failed: {result.Error}");
-    ///     HandleError(result.Error);
+    ///     // Safe to access ErrorMessage property
+    ///     Console.WriteLine($"Operation failed: {result.ErrorMessage}");
+    ///     HandleError(result.ErrorMessage);
     /// }
     /// 
     /// // Pipeline processing with success checks
@@ -231,24 +231,24 @@ public class ToolResult
     ///     var stepResult = await tool.ExecuteAsync(parameters);
     ///     results.Add(stepResult);
     ///     
-    ///     if (!stepResult.Success)
+    ///     if (!stepResult.IsSuccess)
     ///     {
-    ///         _logger.LogError("Pipeline failed at tool {ToolName}: {Error}", 
-    ///                          tool.Name, stepResult.Error);
+    ///         _logger.LogError("Pipeline failed at tool {ToolName}: {ErrorMessage}", 
+    ///                          tool.Name, stepResult.ErrorMessage);
     ///         break; // Stop pipeline on first failure
     ///     }
     /// }
     /// </code>
     /// </example>
-    public bool Success { get; set; }
+    public bool IsSuccess { get; set; }
 
     /// <summary>
     /// Gets or sets the output data produced by successful tool execution.
     /// 
-    /// This property contains the actual result data when <see cref="Success"/> is <c>true</c>.
+    /// This property contains the actual result data when <see cref="IsSuccess"/> is <c>true</c>.
     /// The data can be of any type, allowing tools maximum flexibility in returning appropriate
     /// result types such as strings, complex objects, collections, or computed results.
-    /// When <see cref="Success"/> is <c>false</c>, this property should be <c>null</c>.
+    /// When <see cref="IsSuccess"/> is <c>false</c>, this property should be <c>null</c>.
     /// </summary>
     /// <value>
     /// The output data from tool execution, or <c>null</c> if the operation failed or produced no output.
@@ -262,7 +262,7 @@ public class ToolResult
     /// 
     /// <para><strong>Access Guidelines:</strong></para>
     /// <list type="bullet">
-    /// <item><description>Always check <see cref="Success"/> before accessing this property</description></item>
+    /// <item><description>Always check <see cref="IsSuccess"/> before accessing this property</description></item>
     /// <item><description>Use appropriate casting or pattern matching for strongly-typed access</description></item>
     /// <item><description>Handle null values appropriately even in success scenarios</description></item>
     /// <item><description>Consider using the <see cref="Output"/> property for string representation</description></item>
@@ -284,13 +284,13 @@ public class ToolResult
     /// <code>
     /// // Accessing different data types safely
     /// var textResult = await textProcessor.ExecuteAsync(parameters);
-    /// if (textResult.Success && textResult.Data is string processedText)
+    /// if (textResult.IsSuccess && textResult.Data is string processedText)
     /// {
     ///     Console.WriteLine($"Processed text: {processedText}");
     /// }
     /// 
     /// var queryResult = await databaseTool.ExecuteAsync(parameters);
-    /// if (queryResult.Success && queryResult.Data is List&lt;Dictionary&lt;string, object&gt;&gt; rows)
+    /// if (queryResult.IsSuccess && queryResult.Data is List&lt;Dictionary&lt;string, object&gt;&gt; rows)
     /// {
     ///     Console.WriteLine($"Retrieved {rows.Count} rows");
     ///     foreach (var row in rows)
@@ -300,7 +300,7 @@ public class ToolResult
     /// }
     /// 
     /// var analysisResult = await analyzerTool.ExecuteAsync(parameters);
-    /// if (analysisResult.Success)
+    /// if (analysisResult.IsSuccess)
     /// {
     ///     // Use pattern matching for complex types
     ///     switch (analysisResult.Data)
@@ -326,10 +326,10 @@ public class ToolResult
     /// <summary>
     /// Gets or sets the error message describing why the tool execution failed.
     /// 
-    /// This property contains detailed error information when <see cref="Success"/> is <c>false</c>.
+    /// This property contains detailed error information when <see cref="IsSuccess"/> is <c>false</c>.
     /// The error message should be descriptive enough for debugging and user feedback while
     /// being sanitized to prevent information leakage in production environments. When
-    /// <see cref="Success"/> is <c>true</c>, this property should be <c>null</c>.
+    /// <see cref="IsSuccess"/> is <c>true</c>, this property should be <c>null</c>.
     /// </summary>
     /// <value>
     /// A descriptive error message explaining the failure cause, or <c>null</c> if the operation succeeded.
@@ -392,10 +392,10 @@ public class ToolResult
     /// 
     /// // Handling error results in application logic
     /// var result = await tool.ExecuteAsync(parameters);
-    /// if (!result.Success)
+    /// if (!result.IsSuccess)
     /// {
     ///     // Log detailed error for debugging
-    ///     _logger.LogError("Tool {ToolName} failed: {Error}", tool.Name, result.Error);
+    ///     _logger.LogError("Tool {ToolName} failed: {ErrorMessage}", tool.Name, result.ErrorMessage);
     ///     
     ///     // Return user-friendly message
     ///     return new ApiResponse
@@ -407,7 +407,7 @@ public class ToolResult
     /// }
     /// </code>
     /// </example>
-    public string? Error { get; set; }
+    public string? ErrorMessage { get; set; }
 
     /// <summary>
     /// Gets or sets additional metadata associated with the tool execution result.
@@ -568,7 +568,7 @@ public class ToolResult
     /// <code>
     /// // Using Output property for simple display
     /// var result = await textTool.ExecuteAsync(parameters);
-    /// if (result.Success)
+    /// if (result.IsSuccess)
     /// {
     ///     Console.WriteLine($"Tool output: {result.Output}");
     ///     _logger.LogInformation("Processing completed: {Output}", result.Output);
@@ -589,7 +589,7 @@ public class ToolResult
     /// 
     /// // For better formatting of complex objects, consider JSON serialization
     /// var complexResult = await analysisTool.ExecuteAsync(parameters);
-    /// if (complexResult.Success && complexResult.Data != null)
+    /// if (complexResult.IsSuccess && complexResult.Data != null)
     /// {
     ///     var formattedOutput = JsonSerializer.Serialize(complexResult.Data, new JsonSerializerOptions 
     ///     { 
@@ -599,77 +599,48 @@ public class ToolResult
     /// }
     /// </code>
     /// </example>
+    /// <summary>
+    /// Gets the output data as a string representation. This is a convenience property for backward compatibility.
+    /// </summary>
+    /// <value>The string representation of the Data property, or null if Data is null.</value>
+    /// <remarks>
+    /// This property exists for backward compatibility and returns Data?.ToString(). 
+    /// For direct access to result data, use the Data property instead.
+    /// </remarks>
+    [Obsolete("Use Data property for direct access to result data. This property is maintained for backward compatibility only.")]
     public string? Output => Data?.ToString();
 
     /// <summary>
-    /// Gets a value indicating whether the tool execution completed successfully.
-    /// 
-    /// This property provides a convenient alias for the <see cref="Success"/> property,
-    /// following common Result pattern naming conventions. It returns the same value
-    /// as <see cref="Success"/> and is provided for improved code readability in
-    /// conditional statements and result checking operations.
+    /// Gets or sets a value indicating whether the tool execution completed successfully.
+    /// This is an alias for the IsSuccess property maintained for backward compatibility.
     /// </summary>
-    /// <value>
-    /// <c>true</c> if the tool execution succeeded; otherwise, <c>false</c>.
-    /// This value is identical to <see cref="Success"/>.
-    /// </value>
+    /// <value>The same value as the IsSuccess property.</value>
     /// <remarks>
-    /// This property enhances code readability in conditional expressions and follows
-    /// common naming patterns found in Result-type implementations across various frameworks.
-    /// Use this property interchangeably with <see cref="Success"/> based on your coding
-    /// style and readability preferences.
+    /// This property exists solely for backward compatibility. New code should use the IsSuccess property directly.
+    /// Both properties reference the same underlying field, so changes to either will affect both.
     /// </remarks>
-    /// <example>
-    /// <code>
-    /// var result = await tool.ExecuteAsync(parameters);
-    /// 
-    /// // Both approaches are equivalent:
-    /// if (result.IsSuccess) { /* handle success */ }
-    /// if (result.Success) { /* handle success */ }
-    /// 
-    /// // IsSuccess may be more readable in some contexts:
-    /// var allSuccessful = results.All(r => r.IsSuccess);
-    /// var failedResults = results.Where(r => !r.IsSuccess);
-    /// </code>
-    /// </example>
-    /// <seealso cref="Success"/>
-    public bool IsSuccess => Success;
+    [Obsolete("Use IsSuccess property instead. This alias is maintained for backward compatibility only.")]
+    public bool Success
+    {
+        get => IsSuccess;
+        set => IsSuccess = value;
+    }
 
     /// <summary>
-    /// Gets the error message when the tool execution failed.
-    /// 
-    /// This property provides a convenient alias for the <see cref="Error"/> property,
-    /// following common Result pattern naming conventions. It returns the same value
-    /// as <see cref="Error"/> and is provided for improved code readability when
-    /// accessing error information from failed operations.
+    /// Gets or sets the error message. This is an alias for the ErrorMessage property
+    /// maintained for backward compatibility with existing code.
     /// </summary>
-    /// <value>
-    /// The error message explaining why the tool execution failed, or <c>null</c> if
-    /// the operation succeeded. This value is identical to <see cref="Error"/>.
-    /// </value>
+    /// <value>The same value as the ErrorMessage property.</value>
     /// <remarks>
-    /// This property enhances code readability when accessing error information and follows
-    /// common naming patterns found in Result-type implementations. Use this property
-    /// interchangeably with <see cref="Error"/> based on your coding style preferences.
+    /// This property exists solely for backward compatibility. New code should use the ErrorMessage property directly.
+    /// Both properties reference the same underlying field, so changes to either will affect both.
     /// </remarks>
-    /// <example>
-    /// <code>
-    /// var result = await tool.ExecuteAsync(parameters);
-    /// 
-    /// // Both approaches are equivalent:
-    /// if (!result.IsSuccess)
-    /// {
-    ///     Console.WriteLine($"Error: {result.ErrorMessage}");
-    ///     Console.WriteLine($"Error: {result.Error}");
-    /// }
-    /// 
-    /// // ErrorMessage may be more descriptive in some contexts:
-    /// var errorSummary = failedResults.Select(r => r.ErrorMessage).ToList();
-    /// </code>
-    /// </example>
-    /// <seealso cref="Error"/>
-    /// <seealso cref="IsSuccess"/>
-    public string? ErrorMessage => Error;
+    [Obsolete("Use ErrorMessage property instead. This alias is maintained for backward compatibility only.")]
+    public string? Error
+    {
+        get => ErrorMessage;
+        set => ErrorMessage = value;
+    }
 
     /// <summary>
     /// Creates a new <see cref="ToolResult"/> instance representing a successful tool execution.
@@ -811,7 +782,7 @@ public class ToolResult
     {
         return new ToolResult
         {
-            Success = true,
+            IsSuccess = true,
             Data = data,
             Metadata = metadata ?? new Dictionary<string, object>()
         };
@@ -990,8 +961,8 @@ public class ToolResult
     {
         return new ToolResult
         {
-            Success = false,
-            Error = error,
+            IsSuccess = false,
+            ErrorMessage = error,
             Metadata = metadata ?? new Dictionary<string, object>()
         };
     }

@@ -15,7 +15,7 @@ public class BaseAgentTests
         protected override async Task<AgentResult> ExecuteInternalAsync(AgentRequest request, CancellationToken cancellationToken)
         {
             await Task.Delay(10, cancellationToken);
-            return AgentResult.CreateSuccess($"Processed: {request.Input}");
+            return AgentResult.CreateSuccess($"Processed: {request.Payload}");
         }
     }
 
