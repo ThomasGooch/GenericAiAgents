@@ -22,7 +22,9 @@ public class BackwardCompatibilityTests
 #pragma warning disable CS0618 // Type or member is obsolete
         Assert.Equal(request.RequestId, request.Id);
         Assert.Equal(request.Payload, request.Input);
-        Assert.NotNull(request.CancellationToken);
+        // CancellationToken property should be accessible (value type)
+        var token = request.CancellationToken;
+        Assert.True(true); // Just verify the obsolete property is accessible
 #pragma warning restore CS0618 // Type or member is obsolete
     }
     
