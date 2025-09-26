@@ -100,8 +100,8 @@ public class HttpClientToolTests
 
         var result = await tool.ExecuteAsync(parameters);
 
-        Assert.False(result.Success);
-        Assert.NotNull(result.Error);
+        Assert.False(result.IsSuccess);
+        Assert.NotNull(result.ErrorMessage);
     }
 
     [Fact]
@@ -118,8 +118,8 @@ public class HttpClientToolTests
 
         var result = await tool.ExecuteAsync(parameters);
 
-        Assert.False(result.Success);
-        Assert.Contains("HTTP method", result.Error);
+        Assert.False(result.IsSuccess);
+        Assert.Contains("HTTP method", result.ErrorMessage);
     }
 
     [Fact]

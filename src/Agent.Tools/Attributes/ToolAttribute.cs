@@ -114,7 +114,6 @@ namespace Agent.Tools;
 /// </example>
 /// <seealso cref="BaseTool"/>
 /// <seealso cref="DescriptionAttribute"/>
-/// <seealso cref="Agent.Registry.IToolRegistry"/>
 [AttributeUsage(AttributeTargets.Class)]
 public class ToolAttribute : Attribute
 {

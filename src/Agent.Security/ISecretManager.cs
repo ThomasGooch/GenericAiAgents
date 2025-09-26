@@ -207,10 +207,6 @@ namespace Agent.Security;
 /// }
 /// </code>
 /// </example>
-/// <seealso cref="AzureKeyVaultSecretManager"/>
-/// <seealso cref="EnvironmentSecretManager"/>
-/// <seealso cref="CachedSecretManager"/>
-/// <seealso cref="SecretManagerOptions"/>
 public interface ISecretManager
 {
     /// <summary>
@@ -321,7 +317,7 @@ public interface ISecretManager
     /// <exception cref="InvalidOperationException">
     /// Thrown when the secret manager is not properly configured or the backend is unavailable.
     /// </exception>
-    /// <exception cref="QuotaExceededException">
+    /// <exception cref="InvalidOperationException">
     /// Thrown when storing the secret would exceed storage quotas or limits.
     /// </exception>
     /// <exception cref="OperationCanceledException">
