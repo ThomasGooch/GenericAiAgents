@@ -16,6 +16,7 @@
       CS1574;  <!-- XML comment has cref attribute that could not be resolved -->
       CS1591;  <!-- Missing XML comment for publicly visible type or member -->
       CS0618;  <!-- Obsolete property usage (expected during migration) -->
+      CS0419;  <!-- Ambiguous reference in cref attribute -->
     </NoWarn>
     
     <!-- Still treat these critical warnings as errors -->

@@ -194,7 +194,7 @@ public static class ServiceCollectionExtensions
     /// 
     /// <para><strong>Configuration Requirements:</strong></para>
     /// AI services require proper configuration through <see cref="AIConfiguration"/> to function correctly.
-    /// Use the overloaded <see cref="AddAgentServices"/> methods or manually configure AI settings.
+    /// Use the overloaded <see cref="AddAgentServices(IServiceCollection, IConfiguration?)"/> methods or manually configure AI settings.
     /// 
     /// <para><strong>Provider Support:</strong></para>
     /// The default implementation supports multiple AI providers including OpenAI, Azure OpenAI,
