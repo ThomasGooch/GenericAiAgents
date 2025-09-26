@@ -165,7 +165,7 @@ public class WorkflowPerformanceTests
         stopwatch.Stop();
 
         // Assert
-        Assert.All(results, result => Assert.True(result.Success));
+        Assert.All(results, result => Assert.True(result.IsSuccess));
         Assert.Equal(workflowCount, results.Length);
 
         // Performance targets
@@ -219,8 +219,8 @@ public class WorkflowPerformanceTests
         var parallelResult = await workflowEngine.ExecuteWorkflowAsync(parallelWorkflow);
 
         // Assert
-        Assert.True(sequentialResult.Success);
-        Assert.True(parallelResult.Success);
+        Assert.True(sequentialResult.IsSuccess);
+        Assert.True(parallelResult.IsSuccess);
 
         // Parallel should be significantly faster (at least 50% faster)
         var speedupRatio = sequentialResult.ExecutionTime.TotalMilliseconds / parallelResult.ExecutionTime.TotalMilliseconds;
@@ -260,7 +260,7 @@ public class WorkflowPerformanceTests
             var tasks = workflows.Select(w => workflowEngine.ExecuteWorkflowAsync(w));
             var results = await Task.WhenAll(tasks);
 
-            Assert.All(results, r => Assert.True(r.Success));
+            Assert.All(results, r => Assert.True(r.IsSuccess));
 
             // Force garbage collection
             GC.Collect();
@@ -291,6 +291,6 @@ public class TestAgent : BaseAgent
     {
         // Simulate lightweight processing
         await Task.Delay(10, cancellationToken);
-        return AgentResult.CreateSuccess($"Processed: {request.Input}");
+        return AgentResult.CreateSuccess($"Processed: {request.Payload}");
     }
 }

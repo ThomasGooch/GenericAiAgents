@@ -34,15 +34,15 @@ public class IToolTests
         // Test that ToolResult model exists and has required properties
         var result = new ToolResult
         {
-            Success = true,
+            IsSuccess = true,
             Data = "test data",
-            Error = null,
+            ErrorMessage = null,
             Metadata = new Dictionary<string, object> { { "key", "value" } }
         };
 
-        Assert.True(result.Success);
+        Assert.True(result.IsSuccess);
         Assert.Equal("test data", result.Data);
-        Assert.Null(result.Error);
+        Assert.Null(result.ErrorMessage);
         Assert.Single(result.Metadata);
     }
 
@@ -52,9 +52,9 @@ public class IToolTests
         var data = "success data";
         var result = ToolResult.CreateSuccess(data);
 
-        Assert.True(result.Success);
+        Assert.True(result.IsSuccess);
         Assert.Equal(data, result.Data);
-        Assert.Null(result.Error);
+        Assert.Null(result.ErrorMessage);
         Assert.NotNull(result.Metadata);
     }
 
@@ -64,9 +64,9 @@ public class IToolTests
         var error = "error message";
         var result = ToolResult.CreateError(error);
 
-        Assert.False(result.Success);
+        Assert.False(result.IsSuccess);
         Assert.Null(result.Data);
-        Assert.Equal(error, result.Error);
+        Assert.Equal(error, result.ErrorMessage);
         Assert.NotNull(result.Metadata);
     }
 

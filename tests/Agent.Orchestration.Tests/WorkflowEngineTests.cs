@@ -39,10 +39,10 @@ public class WorkflowEngineTests
         _mockAgent2.Id.Returns("agent2");
 
         _mockAgent1.ProcessAsync(Arg.Any<AgentRequest>(), Arg.Any<CancellationToken>())
-                  .Returns(new AgentResult { Success = true, Output = "Agent 1 result" });
+                  .Returns(new AgentResult { IsSuccess = true, Data = "Agent 1 result" });
 
         _mockAgent2.ProcessAsync(Arg.Any<AgentRequest>(), Arg.Any<CancellationToken>())
-                  .Returns(new AgentResult { Success = true, Output = "Agent 2 result" });
+                  .Returns(new AgentResult { IsSuccess = true, Data = "Agent 2 result" });
 
         // Register agents with workflow engine
         await _workflowEngine.RegisterAgentAsync(_mockAgent1);
@@ -52,10 +52,10 @@ public class WorkflowEngineTests
         var result = await _workflowEngine.ExecuteWorkflowAsync(workflow, CancellationToken.None);
 
         // Assert
-        Assert.True(result.Success);
+        Assert.True(result.IsSuccess);
         Assert.Equal(2, result.StepResults.Count);
-        Assert.Equal("Agent 1 result", result.StepResults[0].Output);
-        Assert.Equal("Agent 2 result", result.StepResults[1].Output);
+        Assert.Equal("Agent 1 result", result.StepResults[0].Data);
+        Assert.Equal("Agent 2 result", result.StepResults[1].Data);
 
         Received.InOrder(() =>
         {
@@ -100,13 +100,13 @@ public class WorkflowEngineTests
         var workflowTask = _workflowEngine.ExecuteWorkflowAsync(workflow, CancellationToken.None);
 
         // Complete both agents simultaneously
-        tcs1.SetResult(new AgentResult { Success = true, Output = "Agent 1 result" });
-        tcs2.SetResult(new AgentResult { Success = true, Output = "Agent 2 result" });
+        tcs1.SetResult(new AgentResult { IsSuccess = true, Data = "Agent 1 result" });
+        tcs2.SetResult(new AgentResult { IsSuccess = true, Data = "Agent 2 result" });
 
         var result = await workflowTask;
 
         // Assert
-        Assert.True(result.Success);
+        Assert.True(result.IsSuccess);
         Assert.Equal(2, result.StepResults.Count);
 
         // Verify both agents were called concurrently
@@ -134,7 +134,7 @@ public class WorkflowEngineTests
         _mockAgent2.Id.Returns("agent2");
 
         _mockAgent1.ProcessAsync(Arg.Any<AgentRequest>(), Arg.Any<CancellationToken>())
-                  .Returns(new AgentResult { Success = false, Error = "Agent 1 failed" });
+                  .Returns(new AgentResult { IsSuccess = false, ErrorMessage = "Agent 1 failed" });
 
         // Register agents with workflow engine
         await _workflowEngine.RegisterAgentAsync(_mockAgent1);
@@ -144,9 +144,9 @@ public class WorkflowEngineTests
         var result = await _workflowEngine.ExecuteWorkflowAsync(workflow, CancellationToken.None);
 
         // Assert
-        Assert.False(result.Success);
+        Assert.False(result.IsSuccess);
         Assert.Single(result.StepResults);
-        Assert.Contains("Agent 1 failed", result.Error);
+        Assert.Contains("Agent 1 failed", result.ErrorMessage);
 
         // Agent 2 should not have been called
         await _mockAgent2.DidNotReceive().ProcessAsync(Arg.Any<AgentRequest>(), Arg.Any<CancellationToken>());
@@ -197,7 +197,7 @@ public class WorkflowEngineTests
         var result = await _workflowEngine.ExecuteWorkflowAsync(workflow, CancellationToken.None);
 
         // Assert
-        Assert.False(result.Success);
-        Assert.Contains("missing-agent", result.Error);
+        Assert.False(result.IsSuccess);
+        Assert.Contains("missing-agent", result.ErrorMessage);
     }
 }

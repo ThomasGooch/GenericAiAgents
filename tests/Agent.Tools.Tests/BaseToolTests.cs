@@ -113,9 +113,9 @@ public class BaseToolTests
 
         var result = await tool.ExecuteAsync(parameters);
 
-        Assert.True(result.Success);
+        Assert.True(result.IsSuccess);
         Assert.Equal("Processed hello 3 times", result.Data);
-        Assert.Null(result.Error);
+        Assert.Null(result.ErrorMessage);
     }
 
     [Fact]
@@ -130,8 +130,8 @@ public class BaseToolTests
 
         var result = await tool.ExecuteAsync(invalidParams);
 
-        Assert.False(result.Success);
-        Assert.Contains("Invalid parameters", result.Error);
+        Assert.False(result.IsSuccess);
+        Assert.Contains("Invalid parameters", result.ErrorMessage);
     }
 
     [Fact]
@@ -142,8 +142,8 @@ public class BaseToolTests
 
         var result = await exceptionTool.ExecuteAsync(parameters);
 
-        Assert.False(result.Success);
-        Assert.Contains("Test exception", result.Error);
+        Assert.False(result.IsSuccess);
+        Assert.Contains("Test exception", result.ErrorMessage);
     }
 
     [Fact]
@@ -157,8 +157,8 @@ public class BaseToolTests
 
         var result = await tool.ExecuteAsync(parameters, cts.Token);
 
-        Assert.False(result.Success);
-        Assert.Contains("cancelled", result.Error, StringComparison.OrdinalIgnoreCase);
+        Assert.False(result.IsSuccess);
+        Assert.Contains("cancelled", result.ErrorMessage, StringComparison.OrdinalIgnoreCase);
     }
 
     [Tool("exception_tool")]

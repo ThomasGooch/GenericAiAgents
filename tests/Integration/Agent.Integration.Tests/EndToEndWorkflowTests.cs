@@ -269,12 +269,12 @@ public class TestAgent : BaseAgent
         await Task.Delay(50, cancellationToken);
 
         // Special case for failure testing
-        if (request.Input?.Contains("FAIL") == true)
+        if (request.Payload?.ToString()?.Contains("FAIL") == true)
         {
             return AgentResult.CreateError("Simulated failure for testing");
         }
 
         // Return success with processed data
-        return AgentResult.CreateSuccess($"Processed by {Name}: {request.Input}");
+        return AgentResult.CreateSuccess($"Processed by {Name}: {request.Payload}");
     }
 }

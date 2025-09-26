@@ -15,7 +15,7 @@ public class BaseAgentTests
         protected override async Task<AgentResult> ExecuteInternalAsync(AgentRequest request, CancellationToken cancellationToken)
         {
             await Task.Delay(10, cancellationToken);
-            return AgentResult.CreateSuccess($"Processed: {request.Input}");
+            return AgentResult.CreateSuccess($"Processed: {request.Payload}");
         }
     }
 
@@ -54,7 +54,7 @@ public class BaseAgentTests
     public async Task BaseAgent_ShouldThrowIfNotInitialized()
     {
         var agent = new TestAgent();
-        var request = new AgentRequest { Input = "test" };
+        var request = new AgentRequest { Payload = "test" };
 
         var exception = await Assert.ThrowsAsync<InvalidOperationException>(
             () => agent.ExecuteAsync(request));
@@ -69,12 +69,12 @@ public class BaseAgentTests
         var config = new AgentConfiguration { Name = "test" };
         await agent.InitializeAsync(config);
 
-        var request = new AgentRequest { Input = "test input" };
+        var request = new AgentRequest { Payload = "test input" };
         var result = await agent.ExecuteAsync(request);
 
-        Assert.True(result.Success);
-        Assert.Equal("Processed: test input", result.Output);
-        Assert.Null(result.Error);
+        Assert.True(result.IsSuccess);
+        Assert.Equal("Processed: test input", result.Data);
+        Assert.Null(result.ErrorMessage);
     }
 
     [Fact]
@@ -89,11 +89,11 @@ public class BaseAgentTests
         var slowAgent = new SlowTestAgent();
         await slowAgent.InitializeAsync(config);
 
-        var request = new AgentRequest { Input = "test" };
+        var request = new AgentRequest { Payload = "test" };
         var result = await slowAgent.ExecuteAsync(request);
 
-        Assert.False(result.Success);
-        Assert.Contains("timed out", result.Error, StringComparison.OrdinalIgnoreCase);
+        Assert.False(result.IsSuccess);
+        Assert.Contains("timed out", result.ErrorMessage, StringComparison.OrdinalIgnoreCase);
     }
 
     [Fact]
@@ -103,11 +103,11 @@ public class BaseAgentTests
         var config = new AgentConfiguration { Name = "test" };
         await agent.InitializeAsync(config);
 
-        var request = new AgentRequest { Input = "test" };
+        var request = new AgentRequest { Payload = "test" };
         var result = await agent.ExecuteAsync(request);
 
-        Assert.False(result.Success);
-        Assert.Contains("Test exception", result.Error);
+        Assert.False(result.IsSuccess);
+        Assert.Contains("Test exception", result.ErrorMessage);
     }
 
     [Fact]
@@ -120,7 +120,7 @@ public class BaseAgentTests
         await agent.DisposeAsync();
 
         // After disposal, agent should not be usable
-        var request = new AgentRequest { Input = "test" };
+        var request = new AgentRequest { Payload = "test" };
         var exception = await Assert.ThrowsAsync<ObjectDisposedException>(
             () => agent.ExecuteAsync(request));
     }

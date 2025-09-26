@@ -8,12 +8,32 @@ public class WorkflowResult
     /// <summary>
     /// Whether the workflow completed successfully
     /// </summary>
-    public bool Success { get; set; }
+    public bool IsSuccess { get; set; }
+
+    /// <summary>
+    /// Whether the workflow completed successfully (backward compatibility)
+    /// </summary>
+    [Obsolete("Use IsSuccess property instead.")]
+    public bool Success
+    {
+        get => IsSuccess;
+        set => IsSuccess = value;
+    }
 
     /// <summary>
     /// Error message if workflow failed
     /// </summary>
-    public string? Error { get; set; }
+    public string? ErrorMessage { get; set; }
+
+    /// <summary>
+    /// Error message if workflow failed (backward compatibility)
+    /// </summary>
+    [Obsolete("Use ErrorMessage property instead.")]
+    public string? Error
+    {
+        get => ErrorMessage;
+        set => ErrorMessage = value;
+    }
 
     /// <summary>
     /// Results from each step execution
@@ -64,17 +84,47 @@ public class WorkflowStepResult
     /// <summary>
     /// Whether the step completed successfully
     /// </summary>
-    public bool Success { get; set; }
+    public bool IsSuccess { get; set; }
+
+    /// <summary>
+    /// Whether the step completed successfully (backward compatibility)
+    /// </summary>
+    [Obsolete("Use IsSuccess property instead.")]
+    public bool Success
+    {
+        get => IsSuccess;
+        set => IsSuccess = value;
+    }
 
     /// <summary>
     /// Output from the step execution
     /// </summary>
-    public string? Output { get; set; }
+    public string? Data { get; set; }
+
+    /// <summary>
+    /// Output from the step execution (backward compatibility)
+    /// </summary>
+    [Obsolete("Use Data property instead.")]
+    public string? Output
+    {
+        get => Data;
+        set => Data = value;
+    }
 
     /// <summary>
     /// Error message if step failed
     /// </summary>
-    public string? Error { get; set; }
+    public string? ErrorMessage { get; set; }
+
+    /// <summary>
+    /// Error message if step failed (backward compatibility)
+    /// </summary>
+    [Obsolete("Use ErrorMessage property instead.")]
+    public string? Error
+    {
+        get => ErrorMessage;
+        set => ErrorMessage = value;
+    }
 
     /// <summary>
     /// Step execution time
