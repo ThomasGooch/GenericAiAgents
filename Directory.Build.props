@@ -1,5 +1,24 @@
 <Project>
   <PropertyGroup>
+    <!-- Version Configuration -->
+    <Version>1.2.0</Version>
+    <AssemblyVersion>1.2.0.0</AssemblyVersion>
+    <FileVersion>1.2.0.0</FileVersion>
+    
+    <!-- Package Metadata -->
+    <Authors>GenericAiAgents Team</Authors>
+    <Company>GenericAiAgents</Company>
+    <Product>GenericAiAgents Framework</Product>
+    <Copyright>Copyright © 2024 GenericAiAgents Team</Copyright>
+    <PackageProjectUrl>https://github.com/YourOrg/GenericAiAgents</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/YourOrg/GenericAiAgents</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <Description>A comprehensive .NET 8 framework for building intelligent, AI-powered applications with enterprise-grade features including security, orchestration, observability, and tool integration.</Description>
+    <PackageTags>ai;agents;artificial-intelligence;framework;dotnet;orchestration;tools</PackageTags>
+    <PackageReleaseNotes>See https://github.com/YourOrg/GenericAiAgents/releases for release notes</PackageReleaseNotes>
+    
     <!-- Build Configuration -->
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>

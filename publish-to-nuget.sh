@@ -18,17 +18,17 @@ echo
 
 # Publish packages in dependency order
 PACKAGES=(
-    "GenericAgents.Core.1.0.0.nupkg"
-    "GenericAgents.Tools.1.0.0.nupkg" 
-    "GenericAgents.Configuration.1.0.0.nupkg"
-    "GenericAgents.Communication.1.0.0.nupkg"
-    "GenericAgents.Security.1.0.0.nupkg"
-    "GenericAgents.Observability.1.0.0.nupkg"
-    "GenericAgents.Registry.1.0.0.nupkg"
-    "GenericAgents.DI.1.0.0.nupkg"
-    "GenericAgents.AI.1.0.0.nupkg"
-    "GenericAgents.Orchestration.1.0.0.nupkg"
-    "GenericAgents.Tools.Samples.1.0.0.nupkg"
+    "GenericAgents.Core.1.2.0.nupkg"
+    "GenericAgents.Tools.1.2.0.nupkg" 
+    "GenericAgents.Configuration.1.2.0.nupkg"
+    "GenericAgents.Communication.1.2.0.nupkg"
+    "GenericAgents.Security.1.2.0.nupkg"
+    "GenericAgents.Observability.1.2.0.nupkg"
+    "GenericAgents.Registry.1.2.0.nupkg"
+    "GenericAgents.DI.1.2.0.nupkg"
+    "GenericAgents.AI.1.2.0.nupkg"
+    "GenericAgents.Orchestration.1.2.0.nupkg"
+    "GenericAgents.Tools.Samples.1.2.0.nupkg"
 )
 
 SUCCESS_COUNT=0
