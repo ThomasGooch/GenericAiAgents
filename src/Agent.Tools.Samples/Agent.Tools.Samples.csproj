@@ -15,9 +15,9 @@
     <Title>Generic AI Agent System - Sample Tools</Title>
     <Description>Sample tool implementations demonstrating file system operations, HTTP requests, and text processing for AI agent workflows.</Description>
     <PackageTags>ai;agents;samples;tools;examples;filesystem;http;text-processing</PackageTags>
-    <Version>1.0.1</Version>
-    <AssemblyVersion>1.0.1.0</AssemblyVersion>
-    <FileVersion>1.0.1.0</FileVersion>
+    <Version>1.2.0</Version>
+    <AssemblyVersion>1.2.0.0</AssemblyVersion>
+    <FileVersion>1.2.0.0</FileVersion>
     <Authors>Thomas Gooch</Authors>
     <Company>Generic Agents</Company>
     <Product>Generic AI Agent System</Product>
